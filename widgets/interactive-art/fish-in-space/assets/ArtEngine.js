@@ -565,9 +565,6 @@ function createArtEngine() {
                 ctx.arc(cue.x, cue.y, 5 + age * 12, 0, Math.PI * 2);
                 ctx.stroke();
             }
-        },
-        inspect() {
-            return { time: school.time, gathered: school.gathered, fish: school.fish.map(f => ({ x: f.x, y: f.y, heading: f.heading, target: f.target, trail: f.trail.length })) };
         }
     };
 }

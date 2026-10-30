@@ -11,17 +11,12 @@ function createArtEngine() {
     };
 
     const design = { density: 'Fine', accent: '#cc1515' };
-    const state = { paused: false, time: 0, w: 700, h: 380, pointer: { x: 0, y: 0, inside: false, down: false }, forms: [], signals: [], fossils: [] };
-    const specimen = { freeze: null };
-    const orbit = { selected: 2, bodies: Array.from({ length: 5 }, (_, i) => ({ phase: i * 1.24, r: .4 + i * .125, speed: (i % 2 ? -1 : 1) * (.15 + i * .028), spin: 0 })) };
-    const resonance = { playing: false };
+    const state = { paused: false, time: 0, w: 700, h: 380, signals: [] };
     const targets = [[28, 64, 76], [72, 35, 58], [46, 82, 31]], discoveries = ['Scout vessel', 'Ribbed wanderer', 'The broken crown'];
     const signal = { index: 0, values: [50, 50, 50], locked: false };
-    const gravity = { center: false, second: false, particles: [] };
-    const fossil = { rotation: 25, name: 'Quiet engine' };
     const meta = { "style": "lab", "title": "Signal hunting", "hint": "Tune the three dials until the hidden shape resolves", "brand": "TSUGUMORI // PLAY", "fields": 3 };
     const fields = [{ "key": "tune:0", "type": "range", "label": "Frequency", "value": 50.0, "min": 0, "max": 100, "step": 1, "outputKey": "tune0" }, { "key": "tune:1", "type": "range", "label": "Phase", "value": 50.0, "min": 0, "max": 100, "step": 1, "outputKey": "tune1" }, { "key": "tune:2", "type": "range", "label": "Gain", "value": 50.0, "min": 0, "max": 100, "step": 1, "outputKey": "tune2" }];
-    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "assist": { "key": "assist", "type": "button", "label": "Assist one dial", "disabled": false, "hidden": false, "pressed": false }, "collect": { "key": "collect", "type": "button", "label": "Collect discovery", "disabled": true, "hidden": false, "pressed": false }, "next-signal": { "key": "next-signal", "type": "button", "label": "Next signal", "disabled": false, "hidden": false, "pressed": false } }, outputs: { "tune0": "50 \u00b7 cold", "tune1": "50 \u00b7 warm", "tune2": "50 \u00b7 cold" }, qualities: {}, archives: [], status: "", focus: "" };
+    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "assist": { "key": "assist", "type": "button", "label": "Assist one dial", "disabled": false, "hidden": false, "pressed": false }, "collect": { "key": "collect", "type": "button", "label": "Collect discovery", "disabled": true, "hidden": false, "pressed": false }, "next-signal": { "key": "next-signal", "type": "button", "label": "Next signal", "disabled": false, "hidden": false, "pressed": false } }, outputs: { "tune0": "50 \u00b7 cold", "tune1": "50 \u00b7 warm", "tune2": "50 \u00b7 cold" }, qualities: {}, archives: [], status: "" };
 
     function status(value) {
         view.status = value;
@@ -105,20 +100,6 @@ function createArtEngine() {
         const a = u * TAU, r = .48 + .45 * (Math.floor(u * 7) % 2);
 
         return [r * Math.cos(a) * 1.3, r * Math.sin(a), .2 * Math.sin(v * TAU)];
-    }
-
-    function wells() {
-        const all = [];
-
-        if (state.pointer.down)
-            all.push({ x: state.pointer.x, y: state.pointer.y });
-        else if (gravity.center)
-            all.push({ x: state.w * .5, y: state.h * .5 });
-
-        if (gravity.second)
-            all.push({ x: state.w * .73, y: state.h * .36 });
-
-        return all;
     }
 
     function drawSignal() {
@@ -215,20 +196,6 @@ function createArtEngine() {
         }
     };
 
-    function pointerMove(p) {
-        state.pointer.x = p.x;
-        state.pointer.y = p.y;
-        state.pointer.inside = true;
-    }
-
-    function pointerDown(p) {
-        state.pointer = Object.assign(Object.assign({}, p), { inside: true, down: true });
-    }
-
-    function pointerUp() {
-        state.pointer.down = false;
-    }
-
     function resize(w, h) {
         w = Math.max(1, w);
         h = Math.max(80, h);
@@ -249,7 +216,7 @@ function createArtEngine() {
                 actions.motion();
         },
         controls() {
-            return fields.map(c => (Object.assign(Object.assign({}, c), { output: view.outputs[c.outputKey] || '', quality: c.key.startsWith('tune:') ? view.qualities[c.key.slice(5)] : undefined }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
+            return fields.map(c => (Object.assign({}, c, { output: view.outputs[c.outputKey] || '', quality: c.key.startsWith('tune:') ? view.qualities[c.key.slice(5)] : undefined }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
         },
         status() {
             return view.status;
@@ -259,7 +226,6 @@ function createArtEngine() {
         },
         action(key, value) {
             var _a;
-            view.focus = '';
 
             if (key.startsWith('input:')) {
                 return;
@@ -273,24 +239,10 @@ function createArtEngine() {
             else if (view.buttons[key] && !view.buttons[key].disabled && actions[key])
                 actions[key]();
 
-            return view.focus;
+            return '';
         },
-        pointer(kind, x, y) {
-            const p = { x, y };
-
-            if (kind === 'move')
-                pointerMove(p);
-
-            if (kind === 'down')
-                pointerDown(p);
-
-            if (kind === 'up')
-                pointerUp();
-
-            if (kind === 'leave') {
-                state.pointer.inside = false;
-            }
-        },
+        // Required host callbacks; this design responds through its controls.
+        pointer() {},
         key() {},
         configure(settings) {
             Object.assign(design, settings);
@@ -304,13 +256,7 @@ function createArtEngine() {
             background();
             drawSignal(dt);
         },
-        suspend() {
-            state.pointer.down = false;
-            state.pointer.inside = false;
-        },
-        inspect() {
-            return { time: state.time, forms: state.forms.length, signals: state.signals.slice(), fossils: state.fossils.map(f => (Object.assign({}, f))), held: !!specimen.freeze, orbit: orbit.bodies.map(b => (Object.assign({}, b))), selected: orbit.selected, locked: signal.locked, wells: wells().length, particles: gravity.particles.length, playing: resonance.playing, rotation: fossil.rotation, name: fossil.name };
-        }
+        suspend() {}
     };
 
     updateMotion();

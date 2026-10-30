@@ -11,8 +11,6 @@
   import nine from './assets/number-9.svg';
   import heroThree from './assets/hero-count-3.svg';
   import heroNine from './assets/hero-count-9.svg';
-  import menuThree from './assets/menu-count-3.svg';
-  import menuNine from './assets/menu-count-9.svg';
   import libraryThree from './assets/library-count-3.svg';
   import libraryNine from './assets/library-count-9.svg';
 
@@ -23,13 +21,12 @@
   // Masks preserve Figma's outlines while applying each screen's palette.
   const designs = {
     hero: [heroThree, heroNine],
-    menu: [menuThree, menuNine],
     library: [libraryThree, libraryNine],
   };
 </script>
 
 <div class="numeral numeral-{variant}" role="img" aria-label={String(value)}>
-  {#if value === 39}
+  {#if value === 39 && variant !== 'menu'}
     {#each designs[variant] as src}<span class="designed-digit" style:mask-image={`url("${src}")`}></span>{/each}
   {:else}
     {#each String(value).padStart(2, '0') as digit}

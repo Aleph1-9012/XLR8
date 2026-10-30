@@ -201,9 +201,6 @@ function createArtEngine() {
             var _a;
             study.pointer('up', 0, 0);
             (_a = study.suspend) === null || _a === void 0 ? void 0 : _a.call(study);
-        },
-        inspect() {
-            return { time, paused, controls: study.controls() };
         }
     };
 }

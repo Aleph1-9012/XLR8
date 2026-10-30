@@ -6,17 +6,11 @@ function createArtEngine() {
     const TAU = Math.PI * 2, clamp = (n, a, b) => Math.max(a, Math.min(b, n)), mix = (a, b, t) => a + (b - a) * t;
 
     const design = { density: 'Fine', accent: '#cc1515' };
-    const state = { paused: false, time: 0, w: 700, h: 380, pointer: { x: 0, y: 0, inside: false, down: false }, forms: [], signals: [], fossils: [] };
+    const state = { paused: false, time: 0, w: 700, h: 380, pointer: { x: 0, y: 0, inside: false }, forms: [] };
     const specimen = { motion: .55, response: 1, freeze: null, ripples: [], offsetX: 0, offsetY: 0 };
-    const orbit = { selected: 2, bodies: Array.from({ length: 5 }, (_, i) => ({ phase: i * 1.24, r: .4 + i * .125, speed: (i % 2 ? -1 : 1) * (.15 + i * .028), spin: 0 })) };
-    const resonance = { playing: false };
-    const targets = [[28, 64, 76], [72, 35, 58], [46, 82, 31]], discoveries = ['Scout vessel', 'Ribbed wanderer', 'The broken crown'];
-    const signal = { index: 0, values: [50, 50, 50], locked: false };
-    const gravity = { center: false, second: false, particles: [] };
-    const fossil = { rotation: 25, name: 'Quiet engine' };
     const meta = { "style": "lab", "title": "Specimen chamber", "hint": "Move to attract \u00b7 Click to send a ripple", "brand": "TSUGUMORI // PLAY", "fields": 2 };
     const fields = [{ "key": "input:response", "type": "select", "label": "Pointer response", "value": "1", "options": [{ "value": "1", "label": "Attract" }, { "value": "-1", "label": "Repel" }] }, { "key": "input:motion", "type": "range", "label": "Motion", "value": 55.0, "min": 0, "max": 100, "step": 1, "outputKey": "motion" }];
-    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "ripple": { "key": "ripple", "type": "button", "label": "Send ripple", "disabled": false, "hidden": false, "pressed": false }, "save-form": { "key": "save-form", "type": "button", "label": "Freeze + keep form", "disabled": false, "hidden": false, "pressed": false }, "release-form": { "key": "release-form", "type": "button", "label": "Release specimen", "disabled": false, "hidden": true, "pressed": false } }, outputs: { "motion": "55%" }, qualities: {}, archives: [], status: "", focus: "" };
+    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "ripple": { "key": "ripple", "type": "button", "label": "Send ripple", "disabled": false, "hidden": false, "pressed": false }, "save-form": { "key": "save-form", "type": "button", "label": "Freeze + keep form", "disabled": false, "hidden": false, "pressed": false }, "release-form": { "key": "release-form", "type": "button", "label": "Release specimen", "disabled": false, "hidden": true, "pressed": false } }, outputs: { "motion": "55%" }, archives: [], status: "" };
 
     function status(value) {
         view.status = value;
@@ -108,7 +102,7 @@ function createArtEngine() {
                 const a = -Math.PI * .89 + k / 23 * Math.PI * 1.78;
                 const p = project(cx + .10 * env * Math.cos(a), cy + radius * Math.cos(a), cz + radius * .82 * Math.sin(a), scale, .35 + Math.sin(phase * .16) * .28, .4);
                 rib.push(p);
-                pts.push(Object.assign(Object.assign({}, p), { r: k % 4 === 0 ? 1.15 : .65, a: .2 + (.7 - p.z * .18) * (.5 + .5 * env) }));
+                pts.push(Object.assign({}, p, { r: k % 4 === 0 ? 1.15 : .65, a: .2 + (.7 - p.z * .18) * (.5 + .5 * env) }));
             }
 
             line(rib, bone(.16 + .16 * env), .65);
@@ -126,20 +120,6 @@ function createArtEngine() {
         dot(head.x, head.y, 2.4, accent());
 
         return spine;
-    }
-
-    function wells() {
-        const all = [];
-
-        if (state.pointer.down)
-            all.push({ x: state.pointer.x, y: state.pointer.y });
-        else if (gravity.center)
-            all.push({ x: state.w * .5, y: state.h * .5 });
-
-        if (gravity.second)
-            all.push({ x: state.w * .73, y: state.h * .36 });
-
-        return all;
     }
 
     function drawSpecimen(dt) {
@@ -172,23 +152,6 @@ function createArtEngine() {
     function updateMotion() {
         button('motion').label = state.paused ? 'Resume motion' : 'Pause motion';
         button('motion').pressed = state.paused;
-    }
-
-    function updateSignal(announce = true) {
-        signal.locked = signal.values.every((v, i) => Math.abs(v - targets[signal.index][i]) <= 5);
-        signal.values.forEach((v, i) => {
-            const diff = Math.abs(v - targets[signal.index][i]), quality = diff <= 5 ? 'matched' : diff <= 14 ? 'warm' : 'cold';
-            output('tune' + i, v + ' · ' + quality);
-            fields.find(c => c.key === 'tune:' + i).value = v;
-            view.qualities[i] = 100 - Math.min(100, diff * 2);
-        });
-
-        button('assist').disabled = signal.locked;
-        button('collect').disabled = !signal.locked || state.signals.includes(signal.index);
-        button('collect').label = state.signals.includes(signal.index) ? 'Collected' : 'Collect discovery';
-
-        if (announce)
-            status(signal.locked ? discoveries[signal.index] + ' found. Collect it to keep a discovery card.' : 'Tune until every dial reads matched. Assist solves one dial.');
     }
 
     function holdForm(f) {
@@ -263,12 +226,8 @@ function createArtEngine() {
     }
 
     function pointerDown(p) {
-        state.pointer = Object.assign(Object.assign({}, p), { inside: true, down: true });
+        state.pointer = Object.assign({}, p, { inside: true });
         actions.ripple();
-    }
-
-    function pointerUp() {
-        state.pointer.down = false;
     }
 
     function resize(w, h) {
@@ -291,7 +250,7 @@ function createArtEngine() {
                 actions.motion();
         },
         controls() {
-            return fields.map(c => (Object.assign(Object.assign({}, c), { output: view.outputs[c.outputKey] || '', quality: c.key.startsWith('tune:') ? view.qualities[c.key.slice(5)] : undefined }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
+            return fields.map(c => (Object.assign({}, c, { output: view.outputs[c.outputKey] || '' }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
         },
         status() {
             return view.status;
@@ -301,7 +260,6 @@ function createArtEngine() {
         },
         action(key, value) {
             var _a;
-            view.focus = '';
 
             if (key.startsWith('input:')) {
                 const f = field(key.slice(6));
@@ -312,16 +270,12 @@ function createArtEngine() {
                 f.value = value;
                 inputValue(key.slice(6), value);
             }
-            else if (key.startsWith('tune:')) {
-                signal.values[Number(key.slice(5))] = Number(value);
-                updateSignal();
-            }
             else if (key.startsWith('archive:'))
                 (_a = view.archives[Number(key.slice(8))]) === null || _a === void 0 ? void 0 : _a.callback();
             else if (view.buttons[key] && !view.buttons[key].disabled && actions[key])
                 actions[key]();
 
-            return view.focus;
+            return '';
         },
         pointer(kind, x, y) {
             const p = { x, y };
@@ -331,9 +285,6 @@ function createArtEngine() {
 
             if (kind === 'down')
                 pointerDown(p);
-
-            if (kind === 'up')
-                pointerUp();
 
             if (kind === 'leave') {
                 state.pointer.inside = false;
@@ -353,11 +304,7 @@ function createArtEngine() {
             drawSpecimen(dt);
         },
         suspend() {
-            state.pointer.down = false;
             state.pointer.inside = false;
-        },
-        inspect() {
-            return { time: state.time, forms: state.forms.length, signals: state.signals.slice(), fossils: state.fossils.map(f => (Object.assign({}, f))), held: !!specimen.freeze, orbit: orbit.bodies.map(b => (Object.assign({}, b))), selected: orbit.selected, locked: signal.locked, wells: wells().length, particles: gravity.particles.length, playing: resonance.playing, rotation: fossil.rotation, name: fossil.name };
         }
     };
 

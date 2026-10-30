@@ -11,17 +11,11 @@ function createArtEngine() {
     };
 
     const design = { accent: '#cc1515' };
-    const state = { paused: false, time: 0, w: 700, h: 380, pointer: { x: 0, y: 0, inside: false, down: false }, forms: [], signals: [], fossils: [] };
-    const specimen = { freeze: null };
-    const orbit = { selected: 2, bodies: Array.from({ length: 5 }, (_, i) => ({ phase: i * 1.24, r: .4 + i * .125, speed: (i % 2 ? -1 : 1) * (.15 + i * .028), spin: 0 })) };
-    const resonance = { playing: false };
-    const targets = [[28, 64, 76], [72, 35, 58], [46, 82, 31]], discoveries = ['Scout vessel', 'Ribbed wanderer', 'The broken crown'];
-    const signal = { index: 0, values: [50, 50, 50], locked: false };
+    const state = { paused: false, time: 0, w: 700, h: 380, pointer: { x: 0, y: 0, down: false } };
     const gravity = { strength: .65, count: 700, center: false, second: false, particles: [] };
-    const fossil = { rotation: 25, name: 'Quiet engine' };
     const meta = { "style": "lab", "title": "Gravity sandbox", "hint": "Hold and drag to pull · Release to scatter · Esc clears wells", "brand": "TSUGUMORI // PLAY", "fields": 2 };
     const fields = [{ "key": "input:gravity", "type": "range", "label": "Gravity", "value": 65.0, "min": 10, "max": 100, "step": 1, "outputKey": "gravity" }, { "key": "input:particles", "type": "range", "label": "Particles", "value": 700.0, "min": 200, "max": 1200, "step": 100, "outputKey": "particles" }];
-    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "well": { "key": "well", "type": "button", "label": "Hold center well", "disabled": false, "hidden": false, "pressed": false }, "second-well": { "key": "second-well", "type": "button", "label": "Add second well", "disabled": false, "hidden": false, "pressed": false }, "scatter": { "key": "scatter", "type": "button", "label": "Scatter", "disabled": false, "hidden": false, "pressed": false } }, outputs: { "gravity": "65%", "particles": "700" }, qualities: {}, archives: [], status: "", focus: "" };
+    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "well": { "key": "well", "type": "button", "label": "Hold center well", "disabled": false, "hidden": false, "pressed": false }, "second-well": { "key": "second-well", "type": "button", "label": "Add second well", "disabled": false, "hidden": false, "pressed": false }, "scatter": { "key": "scatter", "type": "button", "label": "Scatter", "disabled": false, "hidden": false, "pressed": false } }, outputs: { "gravity": "65%", "particles": "700" }, status: "" };
 
     function status(value) {
         view.status = value;
@@ -175,23 +169,6 @@ function createArtEngine() {
         button('motion').pressed = state.paused;
     }
 
-    function updateSignal(announce = true) {
-        signal.locked = signal.values.every((v, i) => Math.abs(v - targets[signal.index][i]) <= 5);
-        signal.values.forEach((v, i) => {
-            const diff = Math.abs(v - targets[signal.index][i]), quality = diff <= 5 ? 'matched' : diff <= 14 ? 'warm' : 'cold';
-            output('tune' + i, v + ' · ' + quality);
-            fields.find(c => c.key === 'tune:' + i).value = v;
-            view.qualities[i] = 100 - Math.min(100, diff * 2);
-        });
-
-        button('assist').disabled = signal.locked;
-        button('collect').disabled = !signal.locked || state.signals.includes(signal.index);
-        button('collect').label = state.signals.includes(signal.index) ? 'Collected' : 'Collect discovery';
-
-        if (announce)
-            status(signal.locked ? discoveries[signal.index] + ' found. Collect it to keep a discovery card.' : 'Tune until every dial reads matched. Assist solves one dial.');
-    }
-
     function releaseWells() {
         const all = wells();
         state.pointer.down = false;
@@ -259,11 +236,10 @@ function createArtEngine() {
     function pointerMove(p) {
         state.pointer.x = p.x;
         state.pointer.y = p.y;
-        state.pointer.inside = true;
     }
 
     function pointerDown(p) {
-        state.pointer = Object.assign(Object.assign({}, p), { inside: true, down: true });
+        state.pointer = Object.assign({}, p, { down: true });
     }
 
     function pointerUp() {
@@ -302,18 +278,15 @@ function createArtEngine() {
                 actions.motion();
         },
         controls() {
-            return fields.map(c => (Object.assign(Object.assign({}, c), { output: view.outputs[c.outputKey] || '', quality: c.key.startsWith('tune:') ? view.qualities[c.key.slice(5)] : undefined }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
+            return fields.map(c => (Object.assign({}, c, { output: view.outputs[c.outputKey] || '' }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
         },
         status() {
             return view.status;
         },
         archives() {
-            return view.archives.map((a, i) => ({ key: 'archive:' + i, label: a.label }));
+            return [];
         },
         action(key, value) {
-            var _a;
-            view.focus = '';
-
             if (key.startsWith('input:')) {
                 const f = field(key.slice(6));
 
@@ -323,16 +296,10 @@ function createArtEngine() {
                 f.value = value;
                 inputValue(key.slice(6), value);
             }
-            else if (key.startsWith('tune:')) {
-                signal.values[Number(key.slice(5))] = Number(value);
-                updateSignal();
-            }
-            else if (key.startsWith('archive:'))
-                (_a = view.archives[Number(key.slice(8))]) === null || _a === void 0 ? void 0 : _a.callback();
             else if (view.buttons[key] && !view.buttons[key].disabled && actions[key])
                 actions[key]();
 
-            return view.focus;
+            return '';
         },
         pointer(kind, x, y) {
             const p = { x, y };
@@ -345,10 +312,6 @@ function createArtEngine() {
 
             if (kind === 'up')
                 pointerUp();
-
-            if (kind === 'leave') {
-                state.pointer.inside = false;
-            }
         },
         key(key) {
             if (key === 'Escape')
@@ -372,10 +335,6 @@ function createArtEngine() {
         },
         suspend() {
             state.pointer.down = false;
-            state.pointer.inside = false;
-        },
-        inspect() {
-            return { time: state.time, forms: state.forms.length, signals: state.signals.slice(), fossils: state.fossils.map(f => (Object.assign({}, f))), held: !!specimen.freeze, orbit: orbit.bodies.map(b => (Object.assign({}, b))), selected: orbit.selected, locked: signal.locked, wells: wells().length, particles: gravity.particles.length, playing: resonance.playing, rotation: fossil.rotation, name: fossil.name };
         }
     };
 

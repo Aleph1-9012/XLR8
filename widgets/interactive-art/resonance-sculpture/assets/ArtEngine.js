@@ -6,17 +6,11 @@ function createArtEngine() {
     const TAU = Math.PI * 2, clamp = (n, a, b) => Math.max(a, Math.min(b, n)), mix = (a, b, t) => a + (b - a) * t;
 
     const design = { density: 'Fine', accent: '#cc1515' };
-    const state = { paused: false, time: 0, w: 700, h: 380, pointer: { x: 0, y: 0, inside: false, down: false }, forms: [], signals: [], fossils: [] };
-    const specimen = { freeze: null };
-    const orbit = { selected: 2, bodies: Array.from({ length: 5 }, (_, i) => ({ phase: i * 1.24, r: .4 + i * .125, speed: (i % 2 ? -1 : 1) * (.15 + i * .028), spin: 0 })) };
+    const state = { paused: false, w: 700, h: 380 };
     const resonance = { playing: false, energy: 0, beat: 'drift', intensity: .7, response: .7, clock: 0, phase: 0, bass: 0, treble: 0 };
-    const targets = [[28, 64, 76], [72, 35, 58], [46, 82, 31]], discoveries = ['Scout vessel', 'Ribbed wanderer', 'The broken crown'];
-    const signal = { index: 0, values: [50, 50, 50], locked: false };
-    const gravity = { center: false, second: false, particles: [] };
-    const fossil = { rotation: 25, name: 'Quiet engine' };
     const meta = { "style": "lab", "title": "Resonance sculpture", "hint": "Bass squeezes the ring · Percussion ripples the rim", "brand": "TSUGUMORI // PLAY", "fields": 2 };
     const fields = [{ "key": "input:beat", "type": "select", "label": "Demo beat", "value": "drift", "options": [{ "value": "drift", "label": "Slow drift \u00b7 72 BPM" }, { "value": "pulse", "label": "Pulse \u00b7 118 BPM" }, { "value": "break", "label": "Broken rhythm \u00b7 144 BPM" }] }, { "key": "input:intensity", "type": "range", "label": "Response", "value": 70.0, "min": 10, "max": 100, "step": 1, "outputKey": "intensity" }];
-    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "music": { "key": "music", "type": "button", "label": "Play demo beat", "disabled": false, "hidden": false, "pressed": false } }, outputs: { "intensity": "70%" }, qualities: {}, archives: [], status: "", focus: "" };
+    const view = { buttons: { "motion": { "key": "motion", "type": "button", "label": "Pause motion", "disabled": false, "hidden": false, "pressed": false }, "music": { "key": "music", "type": "button", "label": "Play demo beat", "disabled": false, "hidden": false, "pressed": false } }, outputs: { "intensity": "70%" }, status: "" };
 
     function status(value) {
         view.status = value;
@@ -81,20 +75,6 @@ function createArtEngine() {
         ctx.clearRect(0, 0, w, h);
         ctx.fillStyle = '#0a0a0a';
         ctx.fillRect(0, 0, w, h);
-    }
-
-    function wells() {
-        const all = [];
-
-        if (state.pointer.down)
-            all.push({ x: state.pointer.x, y: state.pointer.y });
-        else if (gravity.center)
-            all.push({ x: state.w * .5, y: state.h * .5 });
-
-        if (gravity.second)
-            all.push({ x: state.w * .73, y: state.h * .36 });
-
-        return all;
     }
 
     function advanceResonance(dt) {
@@ -186,23 +166,6 @@ function createArtEngine() {
         button('motion').pressed = state.paused;
     }
 
-    function updateSignal(announce = true) {
-        signal.locked = signal.values.every((v, i) => Math.abs(v - targets[signal.index][i]) <= 5);
-        signal.values.forEach((v, i) => {
-            const diff = Math.abs(v - targets[signal.index][i]), quality = diff <= 5 ? 'matched' : diff <= 14 ? 'warm' : 'cold';
-            output('tune' + i, v + ' · ' + quality);
-            fields.find(c => c.key === 'tune:' + i).value = v;
-            view.qualities[i] = 100 - Math.min(100, diff * 2);
-        });
-
-        button('assist').disabled = signal.locked;
-        button('collect').disabled = !signal.locked || state.signals.includes(signal.index);
-        button('collect').label = state.signals.includes(signal.index) ? 'Collected' : 'Collect discovery';
-
-        if (announce)
-            status(signal.locked ? discoveries[signal.index] + ' found. Collect it to keep a discovery card.' : 'Tune until every dial reads matched. Assist solves one dial.');
-    }
-
     const actions = {
         motion() {
             state.paused = !state.paused;
@@ -235,20 +198,6 @@ function createArtEngine() {
         }
     }
 
-    function pointerMove(p) {
-        state.pointer.x = p.x;
-        state.pointer.y = p.y;
-        state.pointer.inside = true;
-    }
-
-    function pointerDown(p) {
-        state.pointer = Object.assign(Object.assign({}, p), { inside: true, down: true });
-    }
-
-    function pointerUp() {
-        state.pointer.down = false;
-    }
-
     function resize(w, h) {
         w = Math.max(1, w);
         h = Math.max(80, h);
@@ -269,18 +218,15 @@ function createArtEngine() {
                 actions.motion();
         },
         controls() {
-            return fields.map(c => (Object.assign(Object.assign({}, c), { output: view.outputs[c.outputKey] || '', quality: c.key.startsWith('tune:') ? view.qualities[c.key.slice(5)] : undefined }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
+            return fields.map(c => (Object.assign({}, c, { output: view.outputs[c.outputKey] || '' }))).concat(Object.values(view.buttons).filter(c => c.key !== 'motion'));
         },
         status() {
             return view.status;
         },
         archives() {
-            return view.archives.map((a, i) => ({ key: 'archive:' + i, label: a.label }));
+            return [];
         },
         action(key, value) {
-            var _a;
-            view.focus = '';
-
             if (key.startsWith('input:')) {
                 const f = field(key.slice(6));
 
@@ -290,33 +236,13 @@ function createArtEngine() {
                 f.value = value;
                 inputValue(key.slice(6), value);
             }
-            else if (key.startsWith('tune:')) {
-                signal.values[Number(key.slice(5))] = Number(value);
-                updateSignal();
-            }
-            else if (key.startsWith('archive:'))
-                (_a = view.archives[Number(key.slice(8))]) === null || _a === void 0 ? void 0 : _a.callback();
             else if (view.buttons[key] && !view.buttons[key].disabled && actions[key])
                 actions[key]();
 
-            return view.focus;
+            return '';
         },
-        pointer(kind, x, y) {
-            const p = { x, y };
-
-            if (kind === 'move')
-                pointerMove(p);
-
-            if (kind === 'down')
-                pointerDown(p);
-
-            if (kind === 'up')
-                pointerUp();
-
-            if (kind === 'leave') {
-                state.pointer.inside = false;
-            }
-        },
+        // Required host callbacks; this design responds through its controls.
+        pointer() {},
         key() {},
         configure(settings) {
             Object.assign(design, settings);
@@ -326,17 +252,10 @@ function createArtEngine() {
             ctx = context;
             resize(w, h);
             const dt = !state.paused && needsMotion() ? Math.min(.04, Math.max(0, elapsed)) : 0;
-            state.time += dt;
             background();
             drawResonance(dt);
         },
-        suspend() {
-            state.pointer.down = false;
-            state.pointer.inside = false;
-        },
-        inspect() {
-            return { time: state.time, forms: state.forms.length, signals: state.signals.slice(), fossils: state.fossils.map(f => (Object.assign({}, f))), held: !!specimen.freeze, orbit: orbit.bodies.map(b => (Object.assign({}, b))), selected: orbit.selected, locked: signal.locked, wells: wells().length, particles: gravity.particles.length, playing: resonance.playing, resonance: Object.assign({}, resonance), rotation: fossil.rotation, name: fossil.name };
-        }
+        suspend() {}
     };
 
     updateMotion();

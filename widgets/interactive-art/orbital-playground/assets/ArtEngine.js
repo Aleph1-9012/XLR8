@@ -409,9 +409,6 @@ function createArtEngine() {
         },
         suspend() {
             orbit.drag = null;
-        },
-        inspect() {
-            return { time: state.time, orbit: orbit.bodies.map(b => Object.assign({}, b)), selected: orbit.selected };
         }
     };
 

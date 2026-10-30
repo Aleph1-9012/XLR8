@@ -102,8 +102,6 @@
   .folder-browse::before, .folder-browse::after { bottom: 0; }
   .folder-browse > span:last-child { font-size: 12px; line-height: 16px; letter-spacing: 0; }
   .folder-open .family-directory-heading { height: 92px; padding-top: 24px; }
-  .folder-open .family-directory-heading h2 { font-size: 24px; line-height: 32px; }
-  .folder-open .family-directory-heading p { bottom: 19px; }
   .folder-open .folder-toggle { min-height: 60px; padding-right: 44px; font-size: 22px; line-height: 30px; }
   .folder-open .expanded .folder-toggle { font-size: 30px; line-height: 39px; }
   .family-preview.compact { padding: 0 16px 20px; }

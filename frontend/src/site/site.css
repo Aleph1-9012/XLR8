@@ -90,7 +90,6 @@ main:focus { outline: none; }
 .designed-digit { display: block; height: 100%; background: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center; }
 .numeral-library .designed-digit { width: 144px; }
 .numeral-library .designed-digit:last-child { width: 120px; }
-.numeral-menu .designed-digit { width: 181.5px; }
 .numeral-hero { height: auto; aspect-ratio: 900 / 460.311; gap: 4.12%; }
 @keyframes hero-count-label {
   from { clip-path: inset(0 100% 0 0); }
@@ -101,7 +100,6 @@ main:focus { outline: none; }
 .numeral-digit.narrow { aspect-ratio: 150 / 240; }
 .numeral-hero .numeral-digit { height: auto; flex: 0 1 43.154%; aspect-ratio: 388.387 / 460.311; mask-size: 100% 100%; }
 .numeral-library { height: 192px; gap: 24px; color: var(--green); }
-.numeral-menu { height: 242px; gap: 16px; color: var(--paper); }
 .registration { position: absolute; right: 1px; top: calc(50% + 20px); display: grid; gap: 4px; }
 .registration i { width: 10px; height: 10px; background: var(--ink); }
 .registration i:nth-child(even) { background: var(--paper); }
