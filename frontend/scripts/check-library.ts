@@ -7,6 +7,7 @@ import { defaults } from '../src/customizer/settings';
 import { generate } from '../src/generator';
 import { loadRevision, readCatalog } from './export';
 import { repository, widgetSources } from './widget-sources';
+import { siteUrl } from '../src/site/metadata';
 
 const decoder = new TextDecoder('utf-8', { fatal: true });
 const origin = 'https://preview.invalid';
@@ -115,6 +116,31 @@ async function checkLibrary() {
   assert.equal((await readdir(dist)).includes('source-index.json'), false, 'Local source index must not enter the production artifact');
 
   const production = await readCatalog(dist);
+  const html = await readFile(join(dist, 'index.html'), 'utf8');
+  assert.ok(html.slice(0, 1024).includes('<meta charset="UTF-8">'), 'The charset declaration must stay within the first 1024 bytes');
+  assert.ok(html.includes('Chaldea: Quickshell widget library'), 'The homepage must contain its heading before JavaScript runs');
+  assert.ok(html.includes('Preview, customize, download QML.'), 'The homepage must explain its Quickshell exports');
+  assert.ok(html.includes('href="?page=library"'), 'The static homepage must link to the library');
+  assert.ok(!html.includes('<!--static-home-->'), 'The homepage must be rendered during the build');
+  assert.ok(html.includes('<noscript><style>#app .masthead[data-liquid-pending]') && html.includes('clip-path: none;'), 'The no-JavaScript artwork rule must override the generated stylesheet');
+
+  for (const match of html.matchAll(/<(?:img|link|script)\b[^>]*>/gi)) {
+    for (const name of ['src', 'href']) {
+      const value = attribute(match[0], name);
+
+      if (!value || value.startsWith('data:') || value.startsWith('https:')) continue;
+
+      const path = new URL(value, origin).pathname;
+      await readFile(join(dist, decodeURIComponent(path.slice(1))));
+    }
+  }
+
+  const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8');
+  const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]!.replaceAll('&amp;', '&'));
+  assert.deepEqual(urls.slice(0, 2), [siteUrl, `${siteUrl}?page=library`]);
+  assert.deepEqual(urls.slice(2).map(url => new URL(url).searchParams.get('widget')).sort(), production.catalog.widgets.map(widget => widget.id).sort(), 'The sitemap must contain exactly the published widgets');
+  assert.ok((await readFile(join(dist, 'robots.txt'), 'utf8')).includes(`Sitemap: ${siteUrl}sitemap.xml`));
+
   const published = [...bundles.values()].flatMap(bundle => bundle.definition.status === 'published' ? [bundle.id] : []).sort();
   assert.deepEqual(production.catalog.widgets.map(widget => widget.id).sort(), published, 'Production catalog must contain exactly the published widgets');
 

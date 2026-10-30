@@ -81,7 +81,7 @@
       <div><p class="breadcrumb">Library / {familyLabel(definition.category)} / {padded(index + 1)}</p><h1>{display.title}</h1></div>
       <div class="detail-facts"><a href={libraryUrl(definition.category)}>← Back to {familyLabel(definition.category)}</a><p>{definition.exports.length} files · {definition.license}{definition.status === 'draft' ? ' · draft' : ''}</p><span>{definition.title}</span></div>
     </header>
-    <div class="detail-workbench" class:art-workbench={definition.category === 'Interactive art'} class:preview-only={!definition.settings.length && definition.category !== 'Interactive art'}>
+    <div class="detail-workbench" class:art-workbench={definition.category === 'Interactive art'} class:slider-workbench={definition.category === 'Sliders'} class:preview-only={!definition.settings.length && definition.category !== 'Interactive art'}>
       <section class="preview-stage" aria-label="Live widget preview">
         <header><span>Live preview</span><small>Browser demo</small></header>
         <div class="preview-viewport" class:loading={previewLoading}>

@@ -1,0 +1,141 @@
+// SPDX-License-Identifier: 0BSD
+pragma ComponentBehavior: Bound
+import QtQuick
+import QtQuick.Controls.Basic as Controls
+
+Rectangle {
+    id: root
+    property string label: {{label}}
+    property int initialValue: {{initialValue}}
+    property int widgetWidth: {{widgetWidth}}
+    property color backgroundColor: {{backgroundColor}}
+    property color textColor: {{textColor}}
+    property color accentColor: {{accentColor}}
+    property int patternSpacing: {{patternSpacing}}
+    property alias value: control.value
+    signal moved(real value)
+
+    implicitWidth: widgetWidth
+    implicitHeight: 66
+    color: backgroundColor
+    border.color: "#333333"
+    border.width: 1
+
+    FontLoader { id: mono; source: "assets/JetBrainsMono-Regular.ttf" }
+
+    Text {
+        x: 11; y: 4; width: root.width - 84; height: 18
+        text: root.label
+        textFormat: Text.PlainText
+        elide: Text.ElideRight
+        verticalAlignment: Text.AlignVCenter
+        color: root.textColor
+        font.family: mono.status === FontLoader.Ready ? mono.name : "monospace"
+        font.pixelSize: 12
+        font.letterSpacing: 0.7
+    }
+
+    Text {
+        x: root.width - 67; y: 4; width: 56; height: 18
+        text: Math.round(control.value) + "%"
+        textFormat: Text.PlainText
+        horizontalAlignment: Text.AlignRight
+        verticalAlignment: Text.AlignVCenter
+        color: root.textColor
+        font.family: mono.status === FontLoader.Ready ? mono.name : "monospace"
+        font.pixelSize: 13
+    }
+
+    Controls.Slider {
+        id: control
+        objectName: "level-control"
+        x: 3; y: 22; width: root.width - 6; height: 44
+        from: 0; to: 100; stepSize: 1; value: root.initialValue
+        padding: 0
+        snapMode: Controls.Slider.SnapAlways
+        touchDragThreshold: 0
+        focusPolicy: Qt.StrongFocus
+        Accessible.name: root.label
+        onMoved: root.moved(value)
+
+        Keys.onPressed: event => {
+            let next = value;
+            if (event.key === Qt.Key_Home) next = from;
+            else if (event.key === Qt.Key_End) next = to;
+            else if (event.key === Qt.Key_PageUp) next = Math.min(to, value + 10);
+            else if (event.key === Qt.Key_PageDown) next = Math.max(from, value - 10);
+            else return;
+
+            if (next !== value) {
+                value = next;
+                root.moved(value);
+            }
+            event.accepted = true;
+        }
+
+        background: Item {
+            id: track
+            x: 8; y: (control.height - height) / 2
+            width: Math.max(0, control.width - 16); height: 10
+            clip: true
+            Canvas {
+                id: pattern
+                anchors.fill: parent
+                property real level: control.visualPosition
+                property int spacing: root.patternSpacing
+                property color accent: root.accentColor
+                property color paper: root.backgroundColor
+                onLevelChanged: requestPaint()
+                onSpacingChanged: requestPaint()
+                onAccentChanged: requestPaint()
+                onPaperChanged: requestPaint()
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+                onPaint: {
+                    const ctx = getContext("2d");
+                    ctx.clearRect(0, 0, width, height);
+                    function stripes(color, thickness) {
+                        ctx.fillStyle = color;
+                        const pitch = spacing / Math.sin(Math.PI / 3);
+                        const stroke = thickness / Math.sin(Math.PI / 3);
+                        const offset = height / Math.sqrt(3);
+                        for (let x = -pitch; x < width + offset; x += pitch) {
+                            ctx.beginPath();
+                            ctx.moveTo(x, 0); ctx.lineTo(x + stroke, 0);
+                            ctx.lineTo(x + stroke - offset, height); ctx.lineTo(x - offset, height);
+                            ctx.closePath(); ctx.fill();
+                        }
+                    }
+                    stripes("#535353", 2);
+                    ctx.save();
+                    ctx.beginPath(); ctx.rect(0, 0, width * level, height); ctx.clip();
+                    ctx.fillStyle = paper; ctx.fillRect(0, 0, width, height);
+                    stripes(accent, 4);
+                    ctx.restore();
+                }
+            }
+        }
+
+        handle: Item {
+            width: 16; height: control.height
+            x: control.visualPosition * (control.width - width)
+            Rectangle {
+                anchors.centerIn: parent
+                width: 2 + 4; height: 18 + 4
+                color: root.backgroundColor
+            }
+            Rectangle {
+                anchors.centerIn: parent
+                width: 2; height: 18
+                color: root.textColor
+                Rectangle { x: -2; width: 6; height: 2; color: root.textColor }
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent; anchors.margins: -3
+        color: "transparent"; border.width: 1; border.color: root.textColor
+        visible: control.visualFocus
+    }
+}

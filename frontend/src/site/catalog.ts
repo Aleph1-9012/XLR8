@@ -39,6 +39,9 @@ const plates = new Map<string, { title: string; ratio: number }>([
   ['quick-notes-index', { title: 'Index', ratio: 333 / 259 }],
   ['quick-notes-preview', { title: 'Preview', ratio: 333 / 366 }],
   ['quick-notes-refined', { title: 'Refined', ratio: 333 / 346 }],
+  ['sliders-comb', { title: 'Comb', ratio: 3 }],
+  ['sliders-slats', { title: 'Slats', ratio: 3 }],
+  ['sliders-stipple-blade', { title: 'Stipple Blade', ratio: 3 }],
   ['tsugumori', { title: 'Phase Lock', ratio: 333 / 208 }],
 ]);
 
@@ -52,13 +55,14 @@ const familyRatios = new Map<string, number>([
   ['Lockscreens', 1],
   ['Quick notes', 9 / 10],
   ['Player', 8 / 5],
+  ['Sliders', 3],
 ]);
 
 export function familyRatio(category: string): number {
   return familyRatios.get(category) ?? 8 / 5;
 }
 
-const familyOrder = ['Glyphs', 'Interactive art', 'Lockscreens', 'Quick notes', 'Player'];
+const familyOrder = ['Glyphs', 'Interactive art', 'Lockscreens', 'Quick notes', 'Player', 'Sliders'];
 
 export function familyLabel(name: string): string {
   if (name === 'Quick notes') return 'Notes';

@@ -1,0 +1,118 @@
+// SPDX-License-Identifier: 0BSD
+pragma ComponentBehavior: Bound
+import QtQuick
+import QtQuick.Controls.Basic as Controls
+
+Rectangle {
+    id: root
+    property string label: {{label}}
+    property int initialValue: {{initialValue}}
+    property int widgetWidth: {{widgetWidth}}
+    property color backgroundColor: {{backgroundColor}}
+    property color textColor: {{textColor}}
+    property color accentColor: {{accentColor}}
+    property int patternSpacing: {{patternSpacing}}
+    property alias value: control.value
+    signal moved(real value)
+
+    implicitWidth: widgetWidth
+    implicitHeight: 66
+    color: backgroundColor
+    border.color: "#333333"
+    border.width: 1
+
+    FontLoader { id: mono; source: "assets/JetBrainsMono-Regular.ttf" }
+
+    Text {
+        x: 11; y: 4; width: root.width - 84; height: 18
+        text: root.label
+        textFormat: Text.PlainText
+        elide: Text.ElideRight
+        verticalAlignment: Text.AlignVCenter
+        color: root.textColor
+        font.family: mono.status === FontLoader.Ready ? mono.name : "monospace"
+        font.pixelSize: 12
+        font.letterSpacing: 0.7
+    }
+
+    Text {
+        x: root.width - 67; y: 4; width: 56; height: 18
+        text: Math.round(control.value) + "%"
+        textFormat: Text.PlainText
+        horizontalAlignment: Text.AlignRight
+        verticalAlignment: Text.AlignVCenter
+        color: root.textColor
+        font.family: mono.status === FontLoader.Ready ? mono.name : "monospace"
+        font.pixelSize: 13
+    }
+
+    Controls.Slider {
+        id: control
+        objectName: "level-control"
+        x: 3; y: 22; width: root.width - 6; height: 44
+        from: 0; to: 100; stepSize: 1; value: root.initialValue
+        padding: 0
+        snapMode: Controls.Slider.SnapAlways
+        touchDragThreshold: 0
+        focusPolicy: Qt.StrongFocus
+        Accessible.name: root.label
+        onMoved: root.moved(value)
+
+        Keys.onPressed: event => {
+            let next = value;
+            if (event.key === Qt.Key_Home) next = from;
+            else if (event.key === Qt.Key_End) next = to;
+            else if (event.key === Qt.Key_PageUp) next = Math.min(to, value + 10);
+            else if (event.key === Qt.Key_PageDown) next = Math.max(from, value - 10);
+            else return;
+
+            if (next !== value) {
+                value = next;
+                root.moved(value);
+            }
+            event.accepted = true;
+        }
+
+        background: Item {
+            id: track
+            x: 8; y: (control.height - height) / 2
+            width: Math.max(0, control.width - 16); height: 8
+            clip: true
+            readonly property int columns: Math.max(0, Math.floor((width - 4) / root.patternSpacing) + 1)
+            readonly property real firstCenter: (width - (columns - 1) * root.patternSpacing) / 2
+            Repeater {
+                model: track.columns
+                Rectangle {
+                    required property int index
+                    x: track.firstCenter + index * root.patternSpacing - 1
+                    width: 2; height: track.height
+                    visible: x >= track.width * control.visualPosition + 3.5
+                    color: root.accentColor; opacity: 0.4667
+                }
+            }
+            Rectangle { width: track.width * control.visualPosition; height: track.height; color: root.accentColor }
+        }
+
+        handle: Item {
+            width: 16; height: control.height
+            x: control.visualPosition * (control.width - width)
+            Rectangle {
+                anchors.centerIn: parent
+                width: 3 + 4; height: 18 + 4
+                color: root.backgroundColor
+            }
+            Rectangle {
+                anchors.centerIn: parent
+                width: 3; height: 18
+                color: root.textColor
+
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent; anchors.margins: -3
+        color: "transparent"; border.width: 1; border.color: root.textColor
+        visible: control.visualFocus
+    }
+}

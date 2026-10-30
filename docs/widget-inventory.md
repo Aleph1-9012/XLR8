@@ -1,6 +1,6 @@
 # Widget inventory
 
-The library contains 38 designs, all with native QML exports: six Quick notes, five Players, eleven Glyphs, seven Interactive art widgets, and nine Lockscreens. No HTML-only drafts remain. Lockscreens export visual components and demo interactions; they do not implement authentication or desktop session locking. This file is the one place these counts are recorded; `make check` prints the current totals. Each distinct design has its own catalog entry, preview document, thumbnail, and settings. Palettes and other appearance controls remain settings. Archive paths identify source provenance; the original archive is not required to build this repository.
+The library contains 41 designs, all with native QML exports: six Quick notes, five Players, eleven Glyphs, seven Interactive art widgets, nine Lockscreens, and three Sliders. No HTML-only drafts remain. Lockscreens export visual components and demo interactions; they do not implement authentication or desktop session locking. Sliders expose a percentage value and user-change signal for a host model. This file is the one place these counts are recorded; `make check` prints the current totals. Each distinct design has its own catalog entry, preview document, thumbnail, and settings. Palettes and other appearance controls remain settings. Archive paths identify source provenance; the original archive is not required to build this repository.
 
 | Source page | Individual widgets |
 | --- | --- |
@@ -18,7 +18,17 @@ Open a design with `/?widget=<widget-id>`. Each widget has its own in-memory sta
 
 ## Native families
 
-All five families have native QML exports. Each family's components, shared files, and inspection notes are in its category folder: [Quick notes](../widgets/quick-notes/README.md), [Player](../widgets/player/README.md), [Glyphs](../widgets/glyphs/README.md), [Interactive art](../widgets/interactive-art/README.md), and [Lockscreens](../widgets/lockscreens/README.md).
+All six families have native QML exports. Each family's components, shared files, and inspection notes are in its category folder: [Quick notes](../widgets/quick-notes/README.md), [Player](../widgets/player/README.md), [Glyphs](../widgets/glyphs/README.md), [Interactive art](../widgets/interactive-art/README.md), [Lockscreens](../widgets/lockscreens/README.md), and [Sliders](../widgets/sliders/README.md).
+
+## Sliders additions
+
+The owner supplied these three retained designs in `Lib-assests/chaldea assets/`. Each became a separate widget with matching browser and native controls. Import removed the surrounding visualization wrapper, persistence bridge, unused variants, and remote helper scripts.
+
+| Source page | Widget |
+| --- | --- |
+| `comb.html` | [Comb](../widgets/sliders/comb/README.md) |
+| `slats.html` | [Slats](../widgets/sliders/slats/README.md) |
+| `stipple-blade.html` | [Stipple Blade](../widgets/sliders/stipple-blade/README.md) |
 
 ## Archive import
 
@@ -37,6 +47,7 @@ Lockscreens retain one entry per layout; artwork and motion variations share tha
 | Lockscreens | 9 |
 | Player | 5 |
 | Quick notes | 6 |
+| Sliders | 3 |
 
 ### Retained source pages
 

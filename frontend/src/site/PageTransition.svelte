@@ -153,7 +153,7 @@
   });
 </script>
 
-<div class="page-print" data-phase={phase} hidden={!active} aria-hidden="true">
+<div class="page-print" hidden={!active} aria-hidden="true">
   <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <mask id={`${id}-cover`} maskUnits="userSpaceOnUse" x="0" y="0" width={width} height={height} style="mask-type: luminance">

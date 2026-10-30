@@ -10,6 +10,14 @@ Pushes to `main` build and deploy automatically through Vercel. `scripts/build-v
 
 Routine website updates do not need package version changes, tags, or GitHub releases. Other Git branches use Vercel preview deployments. Keep the normal Git branch build queue enabled so production builds run sequentially; do not bypass it with concurrent production builds or manual promotion while a build is running.
 
+## Search discovery
+
+The production build includes the homepage in its initial HTML, page metadata, WebSite structured data, `robots.txt`, and a sitemap of the homepage, library, and published widget URLs. Library and widget views still render in JavaScript. Their canonical URLs appear after the catalog loads. Filter, search, and sort variations point to the unfiltered library.
+
+After deployment, verify that [robots.txt](https://chaldea.vercel.app/robots.txt) and [sitemap.xml](https://chaldea.vercel.app/sitemap.xml) return their actual text and XML. In a verified [Google Search Console](https://search.google.com/search-console) property for the site, submit `sitemap.xml`, inspect the homepage and a published widget URL, and request indexing. Check the rendered page and Google-selected canonical. Use performance reports to compare impressions for `quickshell`, `quickshell widgets`, and `quickshell widget library` over time. These account actions are manual; a successful build does not submit anything to Google.
+
+Google determines indexing, rankings, and AI Overview citations. The broad `quickshell` query has different intent from a widget-library recommendation. Keep descriptions accurate and add useful Quickshell examples when there is actual material to document. See Google's [JavaScript SEO guidance](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics), [sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview), and [AI search guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide).
+
 ## Vercel setup and retention
 
 The project ID is `prj_j1kW0OcWUPIaJPK4zP23ylVpeclP` and team ID is `team_CktxYlUSi6kFhrNdcVlUHHkm`. These are identifiers, not credentials. Local `.vercel/` and environment files are ignored by Git.

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
   import { fade } from 'svelte/transition';
   import { prefersReducedMotion } from 'svelte/motion';
   import type { Catalog, LoadedWidget, Summary } from '../catalog/contracts';
@@ -8,6 +8,7 @@
   import { presentation } from './catalog';
   import { analyticsPath, startAnalytics } from './analytics';
   import { libraryUrl } from './links';
+  import { homeDescription, homeTitle, pageMetadata } from './metadata';
   import type { LibrarySort } from './links';
   import Home from './Home.svelte';
   import Navigation from './Navigation.svelte';
@@ -17,6 +18,8 @@
   import PageTransition from './PageTransition.svelte';
   import ModuleLoader from './ModuleLoader.svelte';
   import type { PageOrigin } from './PageTransition.svelte';
+
+  let { initialCatalog }: { initialCatalog?: Catalog } = $props();
 
   function readRoute() {
     const params = new URLSearchParams(location.search);
@@ -32,7 +35,8 @@
   }
 
   let route = $state(readRoute());
-  let catalog = $state.raw<Catalog>();
+  // This prop seeds the initial build snapshot; retries replace it from the CDN.
+  let catalog = $state.raw<Catalog | undefined>(untrack(() => initialCatalog));
   let widget = $state.raw<LoadedWidget>();
   let catalogFailure = $state('');
   let widgetFailure = $state('');
@@ -43,6 +47,9 @@
   let widgetReady: Promise<void> = Promise.resolve();
   let pendingWidget: ReturnType<typeof requestWidget> | undefined;
   let navigationVersion = 0;
+
+  // Wait for the catalog before deciding whether a widget URL is missing.
+  const metadata = $derived(catalog ? pageMetadata(route, catalog.widgets) : undefined);
 
   const reportPage = import.meta.env.PROD && import.meta.env.VITE_VERCEL_ENV === 'production'
     ? startAnalytics()
@@ -81,7 +88,7 @@
   }
 
   onMount(() => {
-    void initialize();
+    if (!catalog) void initialize();
 
     return () => {
       catalogRequest?.abort();
@@ -216,7 +223,17 @@
   }
 </script>
 
-<svelte:head><title>{widget ? `${presentation(widget.bundle.definition).title} · Chaldea` : route.library ? 'Library · Chaldea' : 'Chaldea · Quickshell widget library'}</title></svelte:head>
+<svelte:head>
+  <title>{metadata?.title ?? homeTitle}</title>
+  <meta name="description" content={metadata?.description ?? homeDescription} />
+  <meta property="og:title" content={metadata?.title ?? homeTitle} />
+  <meta property="og:description" content={metadata?.description ?? homeDescription} />
+  {#if metadata}
+    <link rel="canonical" href={metadata.url} />
+    <meta name="robots" content={metadata.robots} />
+    <meta property="og:url" content={metadata.url} />
+  {/if}
+</svelte:head>
 <svelte:document onclick={follow} />
 <svelte:window onpopstate={() => switchRoute(readRoute(), false, false)} />
 

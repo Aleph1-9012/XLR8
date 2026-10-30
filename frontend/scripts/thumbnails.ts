@@ -24,15 +24,27 @@ const selected = (selectors.length ? selectors.map(selector => findWidget(source
   const item = local.catalog.widgets.find(widget => widget.id === source.id);
 
   if (!item) throw new Error(`Missing packaged widget ${source.id}. Run make content.`);
-  if (!source.thumbnailSource.endsWith('.webp')) throw new Error(`${source.id}: thumbnail capture requires a declared WebP source.`);
+  if (!/\.(webp|svg)$/.test(source.thumbnailSource)) throw new Error(`${source.id}: thumbnails must declare a WebP or SVG source.`);
 
   return { source, item };
 });
 
+const captures: typeof selected = [];
+
+for (const entry of selected) {
+  if (entry.source.thumbnailSource.endsWith('.svg')) {
+    console.log(`Preserved vector thumbnail for ${entry.item.id}`);
+  } else {
+    captures.push(entry);
+  }
+}
+
+if (!captures.length) process.exit(0);
+
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ?? (existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined), args: ['--no-sandbox'] });
 
 try {
-  for (const { source, item } of selected) {
+  for (const { source, item } of captures) {
     const { bundle } = await loadRevision(local.root, item);
 
     if (!bundle.definition.publicFiles.some(file => file.path === bundle.definition.thumbnail && file.source === source.thumbnailSource)) throw new Error(`${item.id}: thumbnail source index does not match the packaged revision. Run make content.`);

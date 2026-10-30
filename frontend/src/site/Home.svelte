@@ -17,16 +17,16 @@
       <p>Widgets in the library ↓</p>
       <Numeral value={widgets.length} variant="hero" />
     </div>
-    <h1 class="masthead" data-liquid-pending use:heroLiquid={'masthead'}><span class="sr-only">Widgets</span><img src={masthead} alt="" width="1392" height="240" /></h1>
+    <h1 class="masthead" data-liquid-pending use:heroLiquid={'masthead'}><span class="sr-only">Chaldea: Quickshell widget library</span><img src={masthead} alt="" width="1392" height="240" /></h1>
     <Navigation hero />
     <div class="hero-top">
       <div>
         <p class="hero-total">{widgets.length} widgets</p>
-        <p class="hero-small">Open source.<br />Tunable live.</p>
+        <p class="hero-small">Open-source Quickshell widgets.<br />Preview, customize, download QML.</p>
       </div>
       <div class="hero-intro">
         <h2>Quickshell<br />Widget library</h2>
-        <p class="hero-small">Glyphs. Art. Lockscreens.<br />Notes. Player.</p>
+        <p class="hero-small">Glyphs. Art. Lockscreens.<br />Notes. Player. Sliders.</p>
       </div>
     </div>
     <div class="hero-bottom">

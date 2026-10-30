@@ -3,6 +3,9 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { fileURLToPath } from 'node:url';
 import { readFile, realpath } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
+import { readCatalog } from './scripts/export';
+import { searchFiles } from './scripts/search-files';
+import { homeTitle, homeDescription, websiteData } from './src/site/metadata';
 
 // Development serves every widget, drafts included. Builds copy published revisions only.
 const content = fileURLToPath(new URL('../build/content', import.meta.url));
@@ -24,7 +27,26 @@ export default defineConfig(({ command }) => ({
   publicDir: command === 'build' ? production : content,
   plugins: [svelte(), {
     name: 'generated-content',
+    transformIndexHtml() {
+      // Query-based routes share this HTML. Their canonical is set by the app
+      // after the catalog loads, rather than declaring every route the homepage.
+      return [
+        { tag: 'title', attrs: { 'data-page-meta': '' }, children: homeTitle },
+        { tag: 'meta', attrs: { 'data-page-meta': '', name: 'description', content: homeDescription } },
+        { tag: 'meta', attrs: { 'data-page-meta': '', property: 'og:title', content: homeTitle } },
+        { tag: 'meta', attrs: { 'data-page-meta': '', property: 'og:description', content: homeDescription } },
+        { tag: 'meta', attrs: { property: 'og:site_name', content: 'Chaldea' } },
+        { tag: 'meta', attrs: { property: 'og:type', content: 'website' } },
+        { tag: 'script', attrs: { type: 'application/ld+json' }, children: JSON.stringify(websiteData).replaceAll('<', '\\u003c') },
+      ].map(tag => ({ ...tag, injectTo: 'head' as const }));
+    },
     async generateBundle() {
+      const { catalog } = await readCatalog(production);
+
+      for (const [fileName, source] of Object.entries(searchFiles(catalog.widgets))) {
+        this.emitFile({ type: 'asset', fileName, source });
+      }
+
       for (const name of ['LICENSE', 'NOTICE']) {
         this.emitFile({ type: 'asset', fileName: `${name}.txt`, source: await readFile(new URL(`../${name}`, import.meta.url), 'utf8') });
       }

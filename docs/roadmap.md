@@ -6,13 +6,15 @@ Where the library stands, what gets added next, and how to add it. Update this f
 
 The tooling is complete for anonymous browsing, customization, copying, and downloading: one Rust packager, one QML generator, and a browser-free `make check` that discovers every widget. Rust owns source discovery and emits a local source index for frontend authoring tools; production output contains no source index.
 
-All five families have native QML exports: Quick notes, Player, Glyphs, Interactive art, and Lockscreens. The five extracted Glyphs and nine Lockscreens now export native components with their existing IDs and settings keys. Lockscreens provide visual components and demo interactions, with authentication and desktop session locking left to a separate host. [The inventory](widget-inventory.md) has the counts.
+All six families have native QML exports: Quick notes, Player, Glyphs, Interactive art, Lockscreens, and Sliders. The Sliders family preserves the supplied Comb, Slats, and Stipple Blade designs as separate controls. The five extracted Glyphs and nine Lockscreens export native components with their existing IDs and settings keys. Lockscreens provide visual components and demo interactions, with authentication and desktop session locking left to a separate host. [The inventory](widget-inventory.md) has the counts.
 
 The public Svelte 5 frontend follows the Chaldea-Final and Chaldea Components Figma pages. It includes the poster homepage, searchable masonry library, grouped customization controls, and file-by-file export. It is the only frontend in both development and production, using Rust-packaged catalogs and revisions. The original vanilla backend preview UI has been removed. Bun runs Vite, Svelte diagnostics, and the shared unit tests.
 
 The site is hosted on Vercel at [chaldea.vercel.app](https://chaldea.vercel.app), with fluid selection and customization controls. Live previews show the block loader while starting. The native Vercel build runs project checks before publishing pushes to `main` independently of package releases. A cumulative manifest retains every published widget revision and hashed application asset across updates. [Publishing](publishing.md) records deployment evidence and Git integration setup.
 
 At the owner's request, Vercel production builds now include Web Analytics for visitors and page views. Search text and customization values are excluded; local and preview builds do not collect analytics.
+
+Search discovery now includes a static homepage rendered from the same Svelte components, page descriptions and canonical URLs, WebSite metadata, and a sitemap generated from the published catalog. Library and widget views still require JavaScript. After deployment, Search Console submission and indexing inspection remain manual steps in [publishing](publishing.md#search-discovery).
 
 ## Next, in order
 

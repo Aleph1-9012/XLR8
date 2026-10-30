@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Definition, Settings } from '../catalog/contracts';
-  import { FieldError } from '../customizer/settings';
+  import type { FieldError } from '../customizer/settings';
   import { fade } from 'svelte/transition';
   import { prefersReducedMotion } from 'svelte/motion';
 
@@ -53,7 +53,7 @@
             </select><span aria-hidden="true">↓</span></div>
           {:else if setting.type === 'number'}
             <input class="setting-number" type="number" aria-label={`${setting.label} value`} value={Number(values[setting.key])} min={setting.min} max={setting.max} step={setting.step} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.valueAsNumber)} />
-            <input {id} type="range" value={Number(values[setting.key])} min={setting.min} max={setting.max} step={setting.step} style:--progress={`${Math.max(0, Math.min(100, (Number(values[setting.key]) - setting.min) / (setting.max - setting.min) * 100))}%`} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.valueAsNumber)} />
+            <input {id} type="range" min={setting.min} max={setting.max} step={setting.step} value={Number(values[setting.key])} style:--progress={`${Math.max(0, Math.min(100, (Number(values[setting.key]) - setting.min) / (setting.max - setting.min) * 100))}%`} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.valueAsNumber)} />
             <div class="range-ends" aria-hidden="true"><span>{setting.min}</span><span>{setting.max}</span></div>
           {:else if setting.type === 'boolean'}
             <input {id} class="setting-switch" type="checkbox" role="switch" checked={Boolean(values[setting.key])} oninput={event => change(setting.key, event.currentTarget.checked)} />

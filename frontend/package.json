@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "bunx --bun vite --host 127.0.0.1",
-    "build": "bunx --bun svelte-check --tsconfig ./tsconfig.json && bunx --bun tsc --noEmit && bunx --bun vite build",
+    "build": "bunx --bun svelte-check --tsconfig ./tsconfig.json && bunx --bun tsc --noEmit && bun scripts/build-site.ts",
     "preview": "bunx --bun vite preview --host 127.0.0.1",
     "export": "bun scripts/export.ts",
     "test": "bun test tests"

@@ -152,7 +152,6 @@ function makeMagnetic() {
 function createArtEngine() {
     const study = makeMagnetic();
     let paused = false, time = 0, width = 700, height = 410;
-    const settings = { compact: false };
 
     return {
         meta: { "style": "plate", "title": "MAGNETIC POWDER", "hint": "Drag a pole across the plate. Flip polarity or add a third magnet.", "brand": "TSUGUMORI // PLAY STUDIES", "fields": 3 },
@@ -179,9 +178,8 @@ function createArtEngine() {
             if (paused && kind === 'move')
                 study.update(.033);
         },
-        configure(value) {
-            Object.assign(settings, value);
-        },
+        // Compact canvas settings are applied by the browser and QML hosts.
+        configure() {},
         key() {
         }, needsMotion: () => true,
         render(ctx, w, h, elapsed) {

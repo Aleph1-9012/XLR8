@@ -8,7 +8,7 @@ Chaldea is an interactive widget library for Quickshell. Try a design in your br
 
 [Browse the live library](https://chaldea.vercel.app).
 
-The collection includes quick notes, media players, animated glyphs, interactive art, and lockscreen layouts. Every current catalog entry has a native QML export. See the [inventory](docs/widget-inventory.md) for the designs and current counts.
+The collection includes quick notes, media players, animated glyphs, interactive art, lockscreen layouts, and sliders. Every current catalog entry has a native QML export. See the [inventory](docs/widget-inventory.md) for the designs and current counts.
 
 ## Features
 
@@ -28,6 +28,7 @@ The hosted site uses Vercel Web Analytics for visitor and page-view counts. Sear
 | [Glyphs](widgets/glyphs/README.md) | Drawings that respond to dummy input, deletion, and motion controls. |
 | [Interactive art](widgets/interactive-art/README.md) | Interactive canvases with live controls and collections in the customization panel. |
 | [Lockscreens](widgets/lockscreens/README.md) | One entry per layout, with native visual components and demo interactions. |
+| [Sliders](widgets/sliders/README.md) | Compact percentage controls with comb, slat, and stipple tracks. |
 
 Lockscreen and Glyph previews do not authenticate or lock the desktop session. Those integrations belong in a separate host. Native requirements are listed in each widget's README; the shared Quickshell and Qt baseline is in [chaldea.toml](chaldea.toml).
 

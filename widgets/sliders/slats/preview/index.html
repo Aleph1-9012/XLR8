@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src data:; base-uri 'none'; form-action 'none'">
+<title>Slats</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="slider" aria-label="Slats slider">
+  <div class="heading"><label for="level">VOLUME</label><output for="level"><span data-value>61</span>%</output></div>
+  <div class="field">
+    <div class="track" aria-hidden="true"><div class="remaining"></div><div class="fill"></div><div class="handle"></div></div>
+    <input type="range" id="level" min="0" max="100" step="1" value="61">
+  </div>
+</div>
+<script src="../preview-runtime.js"></script>
+<script src="adapter.js"></script>
+</body>
+</html>

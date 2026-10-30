@@ -21,7 +21,7 @@
     [139.5, 3], [146, 6], [155.5, 3], [162, 4.5], [171.5, 1.5], [176.5, 3],
   ] as const;
 
-  const knownFamilies = new Set(['Glyphs', 'Interactive art', 'Lockscreens', 'Quick notes', 'Player']);
+  const knownFamilies = new Set(['Glyphs', 'Interactive art', 'Lockscreens', 'Quick notes', 'Player', 'Sliders']);
 
   function count(category: string): string {
     return padded(widgets.filter(widget => widget.category === category).length);
@@ -79,8 +79,9 @@
       </div>
       <h2>Player</h2><p>{count('Player')} decks<br />Now playing</p><span class="poster-arrow">↗</span>
     </a>
-    <a class="poster poster-take" href={libraryUrl()}>
-      <h2>Try &gt; Tune &gt; Take.</h2><p>Pick a poster to open its shelf in the library</p><span class="poster-arrow">↗</span>
+    <a class="poster poster-sliders" href={libraryUrl('Sliders')}>
+      <h2>Sliders</h2><p>{count('Sliders')} controls · Set the level</p>
+      <div class="slider-print" aria-hidden="true"><i></i><b></b></div><span class="poster-arrow">↗</span>
     </a>
   </div>
   {#each families(widgets) as family}

@@ -97,6 +97,12 @@ export function liquidSelection(node: HTMLElement, initialValue: string) {
     targetCenter = selected.left + selected.width / 2;
     targetWidth = selected.width;
 
+    // Direct links and keyboard selection can choose a control outside the strip.
+    if (selected.left < node.scrollLeft) node.scrollLeft = selected.left;
+    else if (selected.left + selected.width > node.scrollLeft + node.clientWidth) {
+      node.scrollLeft = selected.left + selected.width - node.clientWidth;
+    }
+
     if (!animate || !initialized || preference.matches || document.hidden) snap();
     else if (!frame && (center.value !== targetCenter || width.value !== targetWidth)) {
       previousTime = performance.now();
