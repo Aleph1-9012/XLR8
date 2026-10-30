@@ -1,6 +1,8 @@
 import { mount } from 'svelte';
 import App from './site/App.svelte';
 import './site/site.css';
+import './site/menu.css';
+import './site/home-phone.css';
 import { assertCatalog } from './catalog/contracts';
 import type { Catalog } from './catalog/contracts';
 
