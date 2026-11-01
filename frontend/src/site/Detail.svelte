@@ -19,6 +19,7 @@
   const definition = $derived(widget.bundle.definition);
   const native = $derived(definition.exports.some(file => file.kind === 'template'));
   const display = $derived(presentation(definition));
+  const compactArt = $derived(definition.id === 'interactive-art-sea-turtle' || definition.id === 'interactive-art-fish-murmuration');
   let proposed = $state<SettingValues>({});
   let snapshot = $state.raw<Snapshot | null>(null);
   let failure = $state('');
@@ -79,9 +80,9 @@
   <div class="detail-slab">
     <header class="detail-heading grain">
       <div><p class="breadcrumb">Library / {familyLabel(definition.category)} / {padded(index + 1)}</p><h1>{display.title}</h1></div>
-      <div class="detail-facts"><a href={libraryUrl(definition.category)}>← Back to {familyLabel(definition.category)}</a><p>{definition.exports.length} files · {definition.license}{definition.status === 'draft' ? ' · draft' : ''}</p><span>{definition.title}</span></div>
+      <div class="detail-facts"><a href={libraryUrl(definition.category)}>← Back to {familyLabel(definition.category)}</a><p>{definition.exports.length} files · {definition.license}{definition.status === 'draft' ? ' · draft' : ''}</p>{#if !compactArt}<span>{definition.title}</span>{/if}</div>
     </header>
-    <div class="detail-workbench" class:art-workbench={definition.category === 'Interactive art'} class:slider-workbench={definition.category === 'Sliders'} class:preview-only={!definition.settings.length && definition.category !== 'Interactive art'}>
+    <div class="detail-workbench" class:art-workbench={definition.category === 'Interactive art'} class:compact-art={compactArt} class:slider-workbench={definition.category === 'Sliders'} class:preview-only={!definition.settings.length && definition.category !== 'Interactive art'}>
       <section class="preview-stage" aria-label="Live widget preview">
         <header><span>Live preview</span><small>Browser demo</small></header>
         <div class="preview-viewport" class:loading={previewLoading}>
@@ -97,7 +98,7 @@
           {#if definition.category === 'Interactive art'}<div class="art-playback" bind:this={playbackHost}></div>{/if}
           <div class:customize-scroll={definition.category === 'Interactive art'}>
             {#if definition.category === 'Interactive art'}<div class="art-interactions" bind:this={interactionHost}></div>{/if}
-            <Settings {definition} values={proposed} error={fieldError} change={(key, value) => commit({ ...proposed, [key]: value })} />
+            <Settings {definition} values={proposed} error={fieldError} choiceButtons={compactArt} change={(key, value) => commit({ ...proposed, [key]: value })} />
             {#if failure}<p class="generation-error" role="alert">{failure}</p>{/if}
           </div>
         </section>

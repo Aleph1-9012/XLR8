@@ -62,6 +62,9 @@
   });
   canvas.addEventListener('pointerleave', () => setPointer(scene, .5, .5, false));
   canvas.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0) return;
+
+    event.preventDefault();
     canvas.dataset.pointerFocus = '';
     canvas.focus({ preventScroll: true });
     const box = canvas.getBoundingClientRect();

@@ -278,6 +278,37 @@ main:focus { outline: none; }
 .art-interactions .interaction-quality { width: 100%; accent-color: var(--ink); }
 .art-interactions .interaction-status { margin-top: 8px; }
 .art-interactions .interaction-error { color: #42100c; }
+.compact-art { max-width: 1280px; margin-inline: auto; }
+.compact-art .preview-stage { min-height: 560px; }
+.compact-art .preview-viewport { align-items: center; padding: 24px; }
+.compact-art .preview-host { max-width: 100%; }
+.compact-art .preview-host iframe { outline: none; }
+.compact-art .customize-panel { padding-inline: 20px; }
+.compact-art .customize-panel > header { height: 49px; }
+.compact-art .customize-scroll { padding-block: 16px; }
+.compact-art .art-playback { padding-block: 12px 20px; }
+.compact-art .art-playback .button, .compact-art .art-interactions .button { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; padding: 12px 16px; border: 0; border-radius: 0; font-size: 12px; line-height: 20px; letter-spacing: .16em; }
+.compact-art .art-playback .button { min-height: 48px; background: var(--ink); color: var(--paper); }
+.compact-art .art-playback .button:hover { background: #242424; }
+.compact-art .art-playback .button::after { content: ''; flex: none; width: 12px; height: 12px; background: linear-gradient(to right, currentColor 0 4px, transparent 4px 8px, currentColor 8px); }
+.compact-art .art-playback .button[aria-pressed=true]::after { background: currentColor; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.compact-art .art-interactions .button { background: var(--paper); color: var(--ink); }
+.compact-art .art-interactions .button:hover { background: #fff; }
+.compact-art .art-interactions { margin-bottom: 20px; }
+.compact-art .interaction-status { color: rgb(17 17 17 / 70%); font-size: 11px; line-height: 1.65; }
+.compact-art .interaction-error { color: #42100c; }
+.compact-art .setting-number { top: -6px; width: 56px; height: 28px; border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.compact-art .setting-field input[type=range] { height: 24px; }
+.compact-art .setting-field input[type=range]::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -7px; }
+.compact-art .setting-field input[type=range]::-moz-range-thumb { width: 16px; height: 16px; }
+.setting-choices { min-width: 0; margin: 0; padding: 0; border: 0; }
+.setting-choices legend { margin-bottom: 10px; padding: 0; font-size: 12px; line-height: 16px; letter-spacing: .18em; text-transform: uppercase; }
+.choice-options { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--ink); border-radius: 8px; }
+.setting-choice { position: relative; flex: 1; min-width: 0; text-align: center; cursor: pointer; }
+.setting-choice > span { display: block; padding: 10px 8px; border-radius: 5px; font-size: 12px; line-height: 16px; letter-spacing: .14em; text-transform: uppercase; transition: background 180ms var(--ease), color 180ms var(--ease); }
+.setting-choice input:checked + span { background: var(--ink); color: var(--paper); }
+.setting-choice input:focus-visible { outline: none; }
+.setting-choice input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 3px; }
 .detail-output { margin: 32px 24px 0; }
 .generated-code { border: 1px solid rgb(242 238 230 / 18%); border-radius: 8px; overflow: hidden; background: var(--ink); }
 .code-toolbar { display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 7px 11px; border-bottom: 1px solid rgb(242 238 230 / 12%); }
@@ -403,6 +434,8 @@ main:focus { outline: none; }
   .detail-workbench { grid-template-columns: minmax(0, 1fr); }
   .customize-panel { height: auto; min-height: 0; max-height: 620px; }
   .art-workbench .customize-panel { max-height: none; }
+  .compact-art .preview-stage { min-height: 0; }
+  .compact-art .preview-viewport { padding: 12px; }
   .customize-scroll { flex: none; overflow-y: visible; overscroll-behavior: auto; }
   .fields-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 24px; }
   .settings-tabs { max-width: 500px; }

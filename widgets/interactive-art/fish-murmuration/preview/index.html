@@ -8,11 +8,11 @@
     <style>
       html { color-scheme: dark; overflow: hidden; }
       body { margin: 0; display: flow-root; background: #030303; }
-      canvas { display: block; width: 100%; max-width: 360px; height: auto; margin-inline: auto; aspect-ratio: 40 / 53; outline: none; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+      canvas { display: block; width: 100%; max-width: 360px; height: auto; margin-inline: auto; aspect-ratio: 40 / 53; outline: none; touch-action: pan-y; user-select: none; -webkit-tap-highlight-color: transparent; }
       canvas:focus-visible:not([data-pointer-focus]) { outline: 2px solid #effbf8; outline-offset: -2px; }
     </style>
   </head>
-  <body>
+  <body data-preview-width="360">
     <canvas id="school" width="720" height="954" tabindex="0" role="img" aria-label="White fish and dotted echoes circling clockwise on black. Move the pointer to part the school. Space pauses; R restarts.">Animated fish school.</canvas>
     <script src="../preview-runtime.js"></script>
     <script src="../assets/FishEngine.js"></script>

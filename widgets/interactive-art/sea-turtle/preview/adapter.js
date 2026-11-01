@@ -85,6 +85,7 @@
   canvas.addEventListener('pointerdown', event => {
     if (!event.isPrimary || event.button !== 0) return;
 
+    event.preventDefault();
     const point = pointFrom(event);
     const onTurtle = sea.hit(point.x, point.y);
     press = { id: event.pointerId, x: point.x, y: point.y, offsetX: turtle.x - point.x, offsetY: turtle.y - point.y, onTurtle, moved: false, velocityX: 0, velocityY: 0, time: event.timeStamp };
