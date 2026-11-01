@@ -1,7 +1,10 @@
 .hero-phone-copy, .hero-phone-arrow { display: none; }
 
 @media (max-width: 540px) {
-  .hero { --phone-count-height: calc((100vw - 48px) * 194.4 / 342); min-height: max(720px, calc(596px + var(--phone-count-height))); }
+  .hero { height: auto; min-height: 100svh; }
+  /* Keep controls in flow; only the count extends beyond the slab's bottom edge. */
+  .hero-slab { height: calc(100svh - 24px); min-height: min-content; padding-bottom: 0; }
+  .hero-slab > :not(.hero-count) { flex-shrink: 0; }
   .hero-nav { margin-top: 12px; }
   .hero-nav .site-nav { flex-wrap: nowrap; gap: 8px; }
   .hero-nav .brand { padding: 8px; }
@@ -9,28 +12,28 @@
   .hero-nav .nav-links { position: static; transform: none; gap: 14px; margin-left: auto; }
   .hero-nav .nav-links a { font-size: 9px; letter-spacing: .1em; }
   .hero-nav .github-link { display: none; }
-  .hero-top { padding-top: 24px; flex-direction: column; gap: 28px; }
+  .hero-top { padding-top: clamp(12px, calc(24px + (100svh - 844px) * .08), 24px); flex-direction: column; gap: clamp(12px, calc(28px + (100svh - 844px) * .1), 28px); }
   .hero-total { font-size: 20px; line-height: 28px; }
   .hero-small { font-size: 8px; line-height: 10.8px; }
   .hero-intro h2 { font-size: clamp(22px, 6vw, 30px); letter-spacing: .16em; }
   .hero-intro .hero-small { margin-top: 10px; }
   .hero-desktop-copy, .hero-count-arrow, .hero-signoff span, .hero-desktop-arrow { display: none; }
   .hero-phone-copy, .hero-phone-arrow { display: block; }
-  .hero-count { left: 12px; top: auto; bottom: -31.4px; width: calc(100% - 24px); }
+  .hero-count { position: relative; inset: auto; order: 1; flex: none; width: 100%; margin-top: 48px; margin-bottom: -31.4px; }
   .hero-count > p { bottom: calc(100% + 11px); font-size: 12px; line-height: 16.8px; letter-spacing: .18em; }
-  .hero-count .numeral-hero { aspect-ratio: 342 / 194.4; gap: 14px; }
+  .hero-count .numeral-hero { height: auto; aspect-ratio: 342 / 194.4; gap: 14px; }
   .hero-count .numeral-hero > span { flex: 1; width: auto; height: auto; aspect-ratio: auto; }
-  .hero-bottom { position: absolute; inset: auto 12px calc(var(--phone-count-height) + 16.6px); display: block; padding: 0; background: transparent; }
-  .hero-actions { position: relative; isolation: isolate; display: block; height: 193px; }
+  .hero-bottom { position: relative; inset: auto; display: block; padding: 12px 0 0; background: transparent; }
+  .hero-actions { position: relative; isolation: isolate; display: block; }
   .hero-actions::before, .hero-actions::after { content: ''; position: absolute; z-index: -1; inset: 0; border-image: url('./assets/home-v2/hero-label.svg') 28 28 12 12 fill / 28px 28px 12px 12px; }
   .hero-actions::after { border-image-source: url('./assets/home-v2/hero-grain.png'); border-image-slice: 56 56 24 24 fill; mix-blend-mode: multiply; opacity: .48; }
-  .hero-tree { height: 77px; padding: 16px; font: 10px/15px var(--mono); }
+  .hero-tree { padding: 16px; font: 10px/15px var(--mono); }
   .hero-buttons { display: flex; gap: 0; align-items: stretch; }
-  .hero-buttons .primary-link { height: 64px; padding: 16px; justify-content: space-between; color: var(--paper); background: var(--ink); font-size: 15px; line-height: 20px; letter-spacing: .18em; }
+  .hero-buttons .primary-link { min-height: 64px; padding: 16px; justify-content: space-between; color: var(--paper); background: var(--ink); font-size: 15px; line-height: 20px; letter-spacing: .18em; }
   .hero-buttons .primary-link:hover { background: #242424; }
   .hero-buttons .primary-link img, .hero-buttons .underlined-link img { width: 13.5312px; height: 13.5312px; filter: none; }
-  .hero-buttons .underlined-link { height: 52px; padding: 16px; margin: 0; border: 0; display: flex; align-items: center; justify-content: space-between; font-size: 12px; line-height: 18px; letter-spacing: .2em; }
-  .hero-signoff { position: absolute; right: 0; top: calc(100% + 20px); display: block; }
+  .hero-buttons .underlined-link { min-height: 52px; padding: 16px; margin: 0; border: 0; display: flex; align-items: center; justify-content: space-between; font-size: 12px; line-height: 18px; letter-spacing: .2em; }
+  .hero-signoff { position: absolute; right: 0; top: calc(100% + 20px); display: block; font-size: 12px; line-height: 16.8px; }
   .hero-signoff small { font-size: 12px; line-height: 16.8px; letter-spacing: .18em; }
   .registration { display: grid; top: calc(50% - 70px); }
 }

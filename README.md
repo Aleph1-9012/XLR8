@@ -1,4 +1,4 @@
-![Chaldea homepage hero at 1440 × 900](docs/assets/chaldea-hero-laptop.jpg)
+![Chaldea homepage with the current widget count and library navigation](docs/assets/chaldea-hero-laptop.jpg)
 
 # Chaldea
 
@@ -19,6 +19,18 @@ The collection includes quick notes, media players, animated glyphs, interactive
 
 The hosted site uses Vercel Web Analytics for visitor and page-view counts. Search text and customization values are excluded. See [analytics and privacy](docs/publishing.md#web-analytics).
 
+## Screenshots
+
+The library offers family filters, search, and previews of each widget.
+
+![Chaldea library with family filters and widget cards](docs/assets/chaldea-library.jpg)
+
+Open a widget to try it live and adjust its settings. This is the Weave slider's preview and customization panel.
+
+![Weave slider with its live preview and customization controls](docs/assets/chaldea-customization.jpg)
+
+These screenshots show the current production build.
+
 ## Widget families
 
 | Family | What it provides |
@@ -28,7 +40,7 @@ The hosted site uses Vercel Web Analytics for visitor and page-view counts. Sear
 | [Glyphs](widgets/glyphs/README.md) | Drawings that respond to dummy input, deletion, and motion controls. |
 | [Interactive art](widgets/interactive-art/README.md) | Interactive canvases with live controls and collections in the customization panel. |
 | [Lockscreens](widgets/lockscreens/README.md) | One entry per layout, with native visual components and demo interactions. |
-| [Sliders](widgets/sliders/README.md) | Compact percentage controls with comb, slat, and stipple tracks. |
+| [Sliders](widgets/sliders/README.md) | Compact percentage controls with comb, slat, stipple, and woven tracks. |
 
 Lockscreen and Glyph previews do not authenticate or lock the desktop session. Those integrations belong in a separate host. Native requirements are listed in each widget's README; the shared Quickshell and Qt baseline is in [chaldea.toml](chaldea.toml).
 

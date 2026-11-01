@@ -42,6 +42,7 @@ const plates = new Map<string, { title: string; ratio: number }>([
   ['sliders-comb', { title: 'Comb', ratio: 3 }],
   ['sliders-slats', { title: 'Slats', ratio: 3 }],
   ['sliders-stipple-blade', { title: 'Stipple Blade', ratio: 3 }],
+  ['sliders-weave', { title: 'Weave', ratio: 3 }],
   ['tsugumori', { title: 'Phase Lock', ratio: 333 / 208 }],
 ]);
 

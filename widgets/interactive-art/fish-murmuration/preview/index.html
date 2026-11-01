@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+    <title>Fish murmuration</title>
+    <style>
+      html { color-scheme: dark; overflow: hidden; }
+      body { margin: 0; display: flow-root; background: #030303; }
+      canvas { display: block; width: 100%; max-width: 360px; height: auto; margin-inline: auto; aspect-ratio: 40 / 53; outline: none; touch-action: pan-y; }
+      canvas:focus-visible { outline: 2px solid #effbf8; outline-offset: -2px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="school" width="720" height="954" tabindex="0" role="img" aria-label="White fish and dotted echoes circling clockwise on black. Move the pointer to part the school. Space pauses; R restarts.">Animated fish school.</canvas>
+    <script src="../preview-runtime.js"></script>
+    <script src="../assets/FishEngine.js"></script>
+    <script src="adapter.js"></script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+{
+  "id": "interactive-art-fish-murmuration",
+  "title": "Fish murmuration",
+  "summary": "A clockwise school of white fish and dotted echoes on black, drawn live in code. Move through the school to part the fish, pause, or restart.",
+  "category": "Interactive art",
+  "tags": [
+    "interactive-art",
+    "fish",
+    "canvas",
+    "qml"
+  ],
+  "status": "published",
+  "preview": "preview/index.html",
+  "thumbnail": "thumbnail.webp",
+  "usage": "README.md",
+  "settings": [
+    {
+      "key": "speed",
+      "label": "Fish speed",
+      "type": "number",
+      "default": 1,
+      "min": 0.25,
+      "max": 3,
+      "step": 0.25
+    }
+  ],
+  "publicFiles": [
+    {
+      "source": "preview/index.html",
+      "path": "preview/index.html"
+    },
+    {
+      "source": "preview/adapter.js",
+      "path": "preview/adapter.js"
+    },
+    {
+      "source": "assets/FishEngine.js",
+      "path": "assets/FishEngine.js"
+    },
+    {
+      "source": "thumbnail.webp",
+      "path": "thumbnail.webp"
+    },
+    {
+      "source": "LICENSE",
+      "path": "LICENSE"
+    }
+  ],
+  "exports": [
+    {
+      "source": "qml/Widget.qml.tmpl",
+      "path": "Widget.qml",
+      "kind": "template"
+    },
+    {
+      "source": "assets/FishEngine.js",
+      "path": "FishEngine.js",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shell.qml",
+      "path": "shell.qml",
+      "kind": "file"
+    },
+    {
+      "source": "README.md",
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "source": "LICENSE",
+      "path": "LICENSE",
+      "kind": "file"
+    }
+  ]
+}

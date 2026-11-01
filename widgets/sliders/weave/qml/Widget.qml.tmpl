@@ -1,0 +1,161 @@
+// SPDX-License-Identifier: 0BSD
+pragma ComponentBehavior: Bound
+import QtQuick
+import QtQuick.Controls.Basic as Controls
+
+Rectangle {
+    id: root
+    property string label: {{label}}
+    property int initialValue: {{initialValue}}
+    property int widgetWidth: {{widgetWidth}}
+    property color backgroundColor: {{backgroundColor}}
+    property color textColor: {{textColor}}
+    property color accentColor: {{accentColor}}
+    property alias value: control.value
+    signal moved(real value)
+
+    implicitWidth: widgetWidth
+    implicitHeight: 76
+    color: backgroundColor
+    border.color: "#333333"
+    border.width: 1
+
+    FontLoader { id: mono; source: "assets/JetBrainsMono-Regular.ttf" }
+
+    Text {
+        x: 13; y: 7; width: Math.max(0, percentage.x - 13 - 16); height: 16
+        text: root.label
+        textFormat: Text.PlainText
+        elide: Text.ElideRight
+        verticalAlignment: Text.AlignVCenter
+        color: root.textColor
+        font.family: mono.status === FontLoader.Ready ? mono.name : "monospace"
+        font.pixelSize: 12
+        font.weight: Font.Medium
+        font.letterSpacing: 0.7
+    }
+
+    Text {
+        id: percentage
+        x: root.width - width - 13; y: 7; height: 16
+        text: Math.round(control.value) + "%"
+        textFormat: Text.PlainText
+        horizontalAlignment: Text.AlignRight
+        verticalAlignment: Text.AlignVCenter
+        color: root.textColor
+        font.family: mono.status === FontLoader.Ready ? mono.name : "monospace"
+        font.pixelSize: 13
+    }
+
+    Controls.Slider {
+        id: control
+        objectName: "level-control"
+        x: 3; y: 23; width: root.width - 6; height: 44
+        from: 0; to: 100; stepSize: 1; value: root.initialValue
+        padding: 0
+        snapMode: Controls.Slider.SnapAlways
+        touchDragThreshold: 0
+        focusPolicy: Qt.StrongFocus
+        Accessible.name: root.label
+        onMoved: root.moved(value)
+
+        Keys.onPressed: event => {
+            let next = value;
+
+            if (event.key === Qt.Key_Home) next = from;
+            else if (event.key === Qt.Key_End) next = to;
+            else if (event.key === Qt.Key_PageUp) next = Math.min(to, value + 10);
+            else if (event.key === Qt.Key_PageDown) next = Math.max(from, value - 10);
+            else if (event.key === Qt.Key_Up) next = Math.min(to, value + stepSize);
+            else if (event.key === Qt.Key_Down) next = Math.max(from, value - stepSize);
+            else return;
+
+            if (next !== value) {
+                // Native setters retain a host's binding to the exported value.
+                const step = stepSize;
+                stepSize = Math.abs(next - value);
+
+                if (next > value) increase();
+                else decrease();
+
+                stepSize = step;
+                root.moved(value);
+            }
+
+            event.accepted = true;
+        }
+
+        background: Item {
+            id: drawing
+            x: 10; y: 4
+            width: Math.max(0, control.width - 20); height: 36
+
+            Canvas {
+                property color patternColor: root.accentColor
+                width: drawing.width * 2; height: drawing.height * 2
+                scale: 0.5
+                transformOrigin: Item.TopLeft
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+                onPatternColorChanged: requestPaint()
+
+                onPaint: {
+                    const ctx = getContext("2d");
+                    ctx.reset();
+                    ctx.scale(2, 2);
+                    ctx.clearRect(0, 0, drawing.width, drawing.height);
+                    ctx.beginPath();
+                    ctx.rect(0, 3, drawing.width, 30);
+                    ctx.clip();
+                    ctx.beginPath();
+
+                    // Keep the five-pixel tile anchored to the full drawing,
+                    // including its three-pixel crop above the visible track.
+                    for (let y = 0; y < drawing.height; y += 5) {
+                        for (let x = 0; x < drawing.width; x += 5) {
+                            ctx.moveTo(x + 0.5, y); ctx.lineTo(x + 0.5, y + 5);
+                            ctx.moveTo(x + 2.5, y); ctx.lineTo(x + 2.5, y + 5);
+                            ctx.moveTo(x, y + 2.5); ctx.lineTo(x + 3, y + 2.5);
+                            ctx.moveTo(x + 2.5, y + 0.5); ctx.lineTo(x + 5, y + 0.5);
+                            ctx.moveTo(x + 2.5, y + 4.5); ctx.lineTo(x + 5, y + 4.5);
+                        }
+                    }
+
+                    ctx.strokeStyle = patternColor;
+                    ctx.lineWidth = 0.7;
+                    ctx.globalAlpha = 0.7;
+                    ctx.stroke();
+                }
+            }
+
+            Rectangle {
+                y: 3
+                width: drawing.width * control.visualPosition; height: 30
+                color: root.accentColor
+            }
+        }
+
+        handle: Item {
+            width: 20; height: control.height
+            x: control.visualPosition * (control.width - width)
+
+            Rectangle {
+                x: (parent.width - width) / 2; y: 4
+                width: 7; height: 36
+                color: root.backgroundColor
+            }
+
+            Rectangle {
+                x: (parent.width - width) / 2; y: 5
+                width: 3; height: 34
+                color: root.textColor
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent; anchors.margins: -3
+        color: "transparent"; border.width: 1; border.color: root.textColor
+        visible: control.visualFocus
+    }
+}

@@ -1,0 +1,28 @@
+License scope
+
+The BSD Zero Clause License below applies to the original renderer and its
+HTML, CSS, JavaScript, and QML implementation in this widget.
+
+The third-party reference video is excluded from this license grant.
+It is retained outside the repository as a private authoring reference and
+is not included in preview files or native exports. The reference post is:
+https://x.com/RaminNasibov/status/2116201987146383447
+
+The post attribution does not identify the video's original creator. Chaldea
+contributors claim no ownership of the footage and grant no license to it.
+Any rights in the third-party media remain with their respective holders.
+
+BSD Zero Clause License
+
+Copyright (c) 2026 Chaldea contributors
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.

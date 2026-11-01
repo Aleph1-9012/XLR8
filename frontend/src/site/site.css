@@ -70,7 +70,7 @@ main:focus { outline: none; }
 .hero-intro h2 { font-size: clamp(44px, 3.055vw, 55px); line-height: 1.04; letter-spacing: .22em; text-transform: uppercase; }
 .hero-intro .hero-small { margin-top: 18px; }
 .hero-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-top: auto; position: relative; z-index: 1; }
-.hero-actions { display: flex; flex-direction: column; align-items: flex-start; gap: calc(43em / 13); font-size: clamp(13px, .902778vw, 16.25px); }
+.hero-actions { display: flex; flex-direction: column; align-items: flex-start; gap: calc(43em / 13); font-size: clamp(11px, .902778vw, 16.25px); }
 .hero-tree { font: calc(11em / 13)/1.4 var(--mono); }
 .hero-buttons { display: flex; flex-direction: column; align-items: flex-start; gap: calc(2em / 13); }
 .primary-link { display: inline-flex; align-items: center; justify-content: center; gap: 12px; background: var(--paper); color: var(--ink); border: 0; padding: 14px 16px 14px 18px; font-size: var(--label-size); line-height: 17px; letter-spacing: .2em; text-transform: uppercase; transition: background 200ms, gap 240ms var(--ease); }
@@ -82,7 +82,7 @@ main:focus { outline: none; }
 .hero-buttons .primary-link:hover img { transform: translateX(calc(3em / 13)); }
 .hero-buttons .underlined-link { margin-inline-start: calc(18em / 13); padding: calc(10em / 13) 0 calc(8em / 13); font-size: 1em; line-height: calc(17 / 13); white-space: nowrap; }
 .hero-signoff { text-align: left; display: grid; justify-items: start; gap: 8px; text-transform: uppercase; }
-.hero-signoff span { font-size: clamp(22px, 1.528vw, 27.5px); letter-spacing: .24em; line-height: 29px; }
+.hero-signoff span { font-size: clamp(17px, 1.528vw, 27.5px); letter-spacing: .24em; line-height: 29px; }
 .hero-signoff small { font-size: var(--label-size); line-height: 1.4; letter-spacing: .16em; white-space: nowrap; }
 .hero-count { position: absolute; width: 63.56%; left: calc(18.22% + 32px); top: 56.05%; pointer-events: none; }
 .hero-count > p { position: absolute; bottom: calc(100% + 16px); left: 0; font-size: clamp(14px, .972222vw, 17.5px); line-height: 1.4; letter-spacing: .18em; text-transform: uppercase; white-space: nowrap; animation: hero-count-label 650ms var(--ease) 160ms both; }
@@ -339,6 +339,11 @@ main:focus { outline: none; }
   .footer-license > a { clip-path: url(#footer-license-chamber); }
   .footer-github-label { flex-direction: column; gap: 0; text-align: center; }
   .footer-github-first-line { gap: .36em; }
+}
+
+@media (min-width: 1100px) {
+  /* Keep the width-scaled artwork and its vertical spacing together in tall windows. */
+  .hero { height: min(100svh, calc(100vw * 2 / 3)); }
 }
 
 @media (max-width: 1600px) {

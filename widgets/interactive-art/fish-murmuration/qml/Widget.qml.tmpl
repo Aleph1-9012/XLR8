@@ -1,0 +1,104 @@
+// SPDX-License-Identifier: 0BSD
+pragma ComponentBehavior: Bound
+import QtQuick
+import QtQuick.Window
+import "FishEngine.js" as Engine
+
+Item {
+    id: root
+
+    property bool paused: false
+    property real speed: {{speed}}
+    property var scene: null
+    property real lastTick: 0
+    readonly property bool running: visible && !paused && scene !== null
+        && width > 0 && height > 0
+        && Window.visibility !== Window.Hidden
+        && Window.visibility !== Window.Minimized
+
+    implicitWidth: 360
+    implicitHeight: 477
+    activeFocusOnTab: true
+    Accessible.role: Accessible.Graphic
+    Accessible.name: "White fish circling on a black background. Move the pointer through the school. Space pauses or resumes. R restarts."
+
+    function restart(): void {
+        if (scene === null) return;
+
+        Engine.reset(scene);
+        lastTick = Date.now();
+        drawing.requestPaint();
+    }
+
+    function point(x: real, y: real, active: bool): void {
+        if (scene === null || width <= 0 || height <= 0) return;
+
+        Engine.setPointer(scene, x / width, y / height, active);
+        drawing.requestPaint();
+    }
+
+    onPausedChanged: {
+        lastTick = Date.now();
+        drawing.requestPaint();
+    }
+    onWidthChanged: drawing.requestPaint()
+    onHeightChanged: drawing.requestPaint()
+    onVisibleChanged: {
+        lastTick = Date.now();
+
+        if (!visible) point(0, 0, false);
+    }
+    Keys.onSpacePressed: paused = !paused
+    Keys.onPressed: event => {
+        if (event.key === Qt.Key_R) {
+            root.restart();
+            event.accepted = true;
+        }
+    }
+
+    Component.onCompleted: {
+        scene = Engine.create();
+        lastTick = Date.now();
+        drawing.requestPaint();
+    }
+
+    Timer {
+        interval: 33
+        repeat: true
+        running: root.running
+        onRunningChanged: root.lastTick = Date.now()
+        onTriggered: {
+            const now = Date.now();
+            const elapsed = Math.max(0, (now - root.lastTick) / 1000);
+            root.lastTick = now;
+            Engine.advance(root.scene, elapsed, Math.max(0, root.speed));
+            drawing.requestPaint();
+        }
+    }
+
+    Canvas {
+        id: drawing
+        anchors.fill: parent
+
+        onPaint: {
+            if (root.scene === null || width < 1 || height < 1) return;
+
+            const context = getContext("2d");
+            context.reset();
+            Engine.draw(context, root.scene, width, height);
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        onPressed: mouse => {
+            root.forceActiveFocus(Qt.MouseFocusReason);
+            root.point(mouse.x, mouse.y, true);
+        }
+        onPositionChanged: mouse => root.point(mouse.x, mouse.y, true)
+        onEntered: root.point(mouseX, mouseY, true)
+        onExited: root.point(0, 0, false)
+        onCanceled: root.point(0, 0, false)
+    }
+}

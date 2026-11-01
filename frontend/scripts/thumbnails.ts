@@ -6,12 +6,20 @@ import { presentation } from '../src/site/catalog';
 import { loadRevision, readCatalog } from './export';
 import { findWidget, repository, widgetSources, writeThumbnail } from './widget-sources';
 
+interface ThumbnailFrame {
+  selector: string;
+  viewportWidth: number;
+  padding: number;
+  background?: { r: number; g: number; b: number; a: number };
+}
+
 // Capture the widget itself when its preview page includes extra space or demo controls.
-const frames = new Map<string, { selector: string; viewportWidth: number; padding: number }>([
+const frames = new Map<string, ThumbnailFrame>([
   ['glyphs-branch-grammar', { selector: '.tr-screen', viewportWidth: 800, padding: 0 }],
   ['glyphs-oblique-ligatures', { selector: '.tr-screen', viewportWidth: 800, padding: 0 }],
   ['glyphs-radical-exchange', { selector: '.tr-screen', viewportWidth: 800, padding: 0 }],
   ['quick-notes-console', { selector: '#ts-notes-c', viewportWidth: 800, padding: 20 }],
+  ['interactive-art-fish-murmuration', { selector: 'canvas', viewportWidth: 968, padding: 64, background: { r: 3, g: 3, b: 3, a: 1 } }],
   ['tsugumori', { selector: '#fl-background-panel', viewportWidth: 1024, padding: 0 }],
 ]);
 
@@ -56,7 +64,7 @@ try {
     const pixelWidth = ratio >= 1.59 ? 2000 : 1320;
     const density = pixelWidth / width;
     const artwork = item.category === 'Interactive art';
-    const frame = frames.get(item.id) ?? (artwork ? { selector: 'canvas', viewportWidth: 800, padding: 0 } : undefined);
+    const frame: ThumbnailFrame | undefined = frames.get(item.id) ?? (artwork ? { selector: 'canvas', viewportWidth: 800, padding: 0 } : undefined);
     const page = await browser.newPage({ viewport: { width: frame?.viewportWidth ?? 800, height: 500 }, deviceScaleFactor: density, reducedMotion: 'reduce' });
     const preview = new URL(bundle.definition.preview, new URL('.', new URL(item.bundleUrl, base)));
     await page.goto(preview.href);
@@ -108,7 +116,7 @@ try {
     }
 
     const cdp = await page.context().newCDPSession(page);
-    await cdp.send('Emulation.setDefaultBackgroundColorOverride', { color: artwork ? { r: 8, g: 8, b: 8, a: 1 } : { r: 25, g: 27, b: 29, a: 1 } });
+    await cdp.send('Emulation.setDefaultBackgroundColorOverride', { color: frame?.background ?? (artwork ? { r: 8, g: 8, b: 8, a: 1 } : { r: 25, g: 27, b: 29, a: 1 }) });
     const { data } = await cdp.send('Page.captureScreenshot', { format: 'webp', quality: 95, captureBeyondViewport: true, clip });
     const destination = await writeThumbnail(source, Buffer.from(data, 'base64'));
 

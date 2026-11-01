@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { tick } from 'svelte';
-  import { prefersReducedMotion } from 'svelte/motion';
+  import { onMount } from 'svelte';
   import type { Summary } from '../catalog/contracts';
   import { families, familyLabel, padded } from './catalog';
   import { libraryUrl } from './links';
   import FamilyPreview from './FamilyPreview.svelte';
+  import { folderMotion } from './folder-motion';
 
   let { widgets }: { widgets: readonly Summary[] } = $props();
   let selected = $state('Glyphs');
   let opened = $state('');
   let section: HTMLElement;
+  let motion: ReturnType<typeof folderMotion>;
   const order = ['Glyphs', 'Lockscreens', 'Interactive art', 'Quick notes', 'Player', 'Sliders'];
   const categories = $derived(families(widgets).sort((a, b) => {
     const first = order.indexOf(a);
@@ -19,14 +20,16 @@
   }));
   const current = $derived(categories.includes(selected) ? selected : categories[0] ?? '');
 
-  async function toggle(family: string): Promise<void> {
-    opened = opened === family ? '' : family;
-    selected = family;
+  onMount(() => {
+    motion = folderMotion(section);
 
-    if (!opened) return;
+    return () => motion.destroy();
+  });
 
-    await tick();
-    window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY, behavior: prefersReducedMotion.current ? 'instant' : 'smooth' });
+  function toggle(family: string, button: HTMLButtonElement): void {
+    motion.run(() => {
+      opened = opened === family ? '' : family;
+    }, button);
   }
 </script>
 
@@ -38,7 +41,7 @@
     </header>
     <nav class="family-directory-rows" class:many-families={categories.length > 8} class:split-families={categories.length > 10} aria-label="Explore families">
       {#each categories as family, index}
-        <a href={libraryUrl(family)} class:selected={current === family} onpointerenter={() => { selected = family; }} onfocus={() => { selected = family; }}>
+        <a href={libraryUrl(family)} class:selected={current === family} class:folder-paper={index % 2 === 1 && index < categories.length - 1} class:folder-dark={index > 0 && index % 2 === 0} onpointerenter={() => { selected = family; }} onfocus={() => { selected = family; }}>
           <span class="directory-index">{padded(index + 1)}</span><span>{familyLabel(family)}</span><span class="directory-arrow" aria-hidden="true">→</span>
         </a>
       {/each}
@@ -53,7 +56,8 @@
   <div class="family-folders">
     {#each categories as family, index}
       <div class="family-folder" class:expanded={opened === family} class:folder-paper={index % 2 === 1 && index < categories.length - 1} class:folder-dark={index > 0 && index % 2 === 0}>
-        <button class="folder-toggle" type="button" aria-expanded={opened === family} aria-controls={`folder-${index}`} onclick={() => toggle(family)}>
+        <span class="folder-surface" aria-hidden="true"></span>
+        <button class="folder-toggle" type="button" aria-expanded={opened === family} aria-controls={`folder-${index}`} onclick={(event) => toggle(family, event.currentTarget)}>
           <span class="folder-index">{padded(index + 1)}</span><span>{familyLabel(family)}</span><span class="folder-arrow" aria-hidden="true">↓</span>
         </button>
         <div class="folder-content" id={`folder-${index}`} inert={opened !== family} aria-hidden={opened !== family}>
