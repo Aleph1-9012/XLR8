@@ -9,6 +9,9 @@
       html { color-scheme: light; overflow: hidden; background: #fefbf4; }
       body { margin: 0; display: flow-root; }
       canvas { display: block; width: 100%; max-width: 640px; height: auto; min-height: 300px; margin-inline: auto; aspect-ratio: 8 / 5; outline: none; touch-action: pan-y; user-select: none; -webkit-tap-highlight-color: transparent; }
+      /* Report a compact minimum height while the canvas fills the host's available area. */
+      html[data-hosted] body { min-height: clamp(300px, 62.5vw, 400px); }
+      html[data-hosted] canvas { position: fixed; inset: 0; max-width: none; height: 100%; aspect-ratio: auto; }
       canvas:focus-visible:not([data-pointer-focus]) { outline: 2px solid #111; outline-offset: -2px; }
       canvas[data-over] { cursor: grab; }
       canvas[data-held] { cursor: grabbing; }

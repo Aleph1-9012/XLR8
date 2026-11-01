@@ -215,6 +215,7 @@ main:focus { outline: none; }
 .art-workbench .preview-viewport { padding: 0; align-items: stretch; }
 .art-workbench .preview-host { max-width: none; }
 .compact-preview .preview-viewport { align-items: center; }
+.fill-preview .preview-viewport { align-items: stretch; }
 .compact-preview .preview-host { max-width: 100%; }
 .compact-preview iframe { outline: none; }
 .preview-viewport.loading { min-height: 432px; }

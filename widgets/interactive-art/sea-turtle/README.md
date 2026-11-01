@@ -36,7 +36,7 @@ Use the repository's Quickshell and Qt baseline with an accelerated Qt Quick bac
 - Tap the turtle to make it dart.
 - Press Space to pause or resume, arrow keys to steer, and R to recenter.
 
-For the browser preview, run `make dev`, then open `/?widget=interactive-art-sea-turtle`. The canvas is capped at 640 × 400 on desktop and fits narrower screens with a 300-pixel minimum height. Its controls customize speed, size, and background, and it starts paused when reduced motion is enabled. A paused click places the turtle at that spot. Without WebGL2 the browser shows the painted turtle still.
+For the browser preview, run `make dev`, then open `/?widget=interactive-art-sea-turtle`. The canvas fills the entire preview area for swimming, clicking, and dragging. Turtle size uses the previous 640 × 400 reference area, shrinking on narrow screens with a 300-pixel minimum height, so a larger swimming area does not enlarge the turtle. Its controls customize speed, size, and background, and it starts paused when reduced motion is enabled. A paused click places the turtle at that spot. Without WebGL2 the browser shows the painted turtle still.
 
 ## Motion and rendering
 

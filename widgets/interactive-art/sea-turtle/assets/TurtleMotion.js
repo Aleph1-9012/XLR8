@@ -365,13 +365,15 @@ var SeaTurtleMotion = (() => {
     };
     let width = 0;
     let height = 0;
+    let sizeWidth = 0;
+    let sizeHeight = 0;
     let scale = 1;
     let size = 1;
     let frozen = false;
     const bodyPixels = () => BODY_LENGTH * scale;
 
     function fitScale() {
-      scale = frozen ? Math.min(width / 1600, height / 2000) : Math.min(height * .66, width * .5, 900) * size / BODY_LENGTH;
+      scale = frozen ? Math.min(width / 1600, height / 2000) : Math.min(sizeHeight * .66, sizeWidth * .5, 900) * size / BODY_LENGTH;
     }
 
     // Fits the reference layout into the canvas, so a capture can be compared with the original.
@@ -530,7 +532,8 @@ var SeaTurtleMotion = (() => {
       }));
     }
 
-    function layout(nextWidth, nextHeight) {
+    // Travel bounds can grow while artwork sizing keeps its original reference area.
+    function layout(nextWidth, nextHeight, nextSizeWidth = nextWidth, nextSizeHeight = nextHeight) {
       if (nextWidth <= 0 || nextHeight <= 0) return;
 
       if (width) {
@@ -548,6 +551,8 @@ var SeaTurtleMotion = (() => {
 
       width = nextWidth;
       height = nextHeight;
+      sizeWidth = nextSizeWidth;
+      sizeHeight = nextSizeHeight;
       fitScale();
 
       if (frozen) placeFrozen();

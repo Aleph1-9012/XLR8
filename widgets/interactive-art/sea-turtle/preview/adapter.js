@@ -5,7 +5,12 @@
   const preview = window.ChaldeaPreview;
   const query = new URLSearchParams(location.search);
   const frozen = query.has('still') || query.has('phase');
-  const sea = window.SeaTurtle.create(canvas);
+  const hosted = window.parent !== window;
+  document.documentElement.toggleAttribute('data-hosted', hosted);
+
+  if (hosted) delete document.body.dataset.previewWidth;
+
+  const sea = window.SeaTurtle.create(canvas, hosted);
   const { turtle } = sea;
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const headings = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };

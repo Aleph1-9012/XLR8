@@ -83,7 +83,7 @@
       <div class="detail-facts"><a href={libraryUrl(definition.category)}>← Back to {familyLabel(definition.category)}</a><p>{definition.exports.length} files · {definition.license}{definition.status === 'draft' ? ' · draft' : ''}</p><span>{definition.title}</span></div>
     </header>
     <div class="detail-workbench" class:art-workbench={definition.category === 'Interactive art'} class:slider-workbench={definition.category === 'Sliders'} class:preview-only={!definition.settings.length && definition.category !== 'Interactive art'}>
-      <section class="preview-stage" class:compact-preview={compactPreview} aria-label="Live widget preview">
+      <section class="preview-stage" class:compact-preview={compactPreview} class:fill-preview={definition.id === 'interactive-art-sea-turtle'} aria-label="Live widget preview">
         <header><span>Live preview</span><small>Browser demo</small></header>
         <div class="preview-viewport" class:loading={previewLoading} style:background-color={definition.id === 'interactive-art-sea-turtle' ? proposed.background === 'White' ? '#fff' : '#fefbf4' : undefined}>
           <div class="preview-host" aria-busy={previewLoading} bind:this={host}></div>

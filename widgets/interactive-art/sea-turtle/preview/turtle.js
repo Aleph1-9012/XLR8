@@ -231,7 +231,7 @@
   }
 
   // Draws one turtle into a canvas. adapter.js owns input, playback, and settings.
-  function create(canvas) {
+  function create(canvas, compactSize = false) {
     const scene = Motion.create();
     const { turtle, advance, hit, call, dart, recenter, bodyPixels } = scene;
     let width = 0;
@@ -306,7 +306,9 @@
       const ratio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
       const exact = devicePixels && Math.abs(devicePixels.inlineSize - nextWidth * ratio) <= 1 && Math.abs(devicePixels.blockSize - nextHeight * ratio) <= 1;
 
-      scene.layout(nextWidth, nextHeight);
+      const sizeWidth = compactSize ? Math.min(nextWidth, 640) : nextWidth;
+      const sizeHeight = compactSize ? Math.max(300, sizeWidth * 5 / 8) : nextHeight;
+      scene.layout(nextWidth, nextHeight, sizeWidth, sizeHeight);
       width = scene.width;
       height = scene.height;
       scale = scene.scale;
