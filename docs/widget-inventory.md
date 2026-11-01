@@ -1,6 +1,8 @@
 # Widget inventory
 
-The library contains 43 published entries: six Quick notes, five Players, eleven Glyphs, eight Interactive art widgets, nine Lockscreens, and four Sliders. All have native QML exports and are included in production builds. Lockscreens export visual components and demo interactions; they do not implement authentication or desktop session locking. Sliders expose a percentage value and user-change signal for a host model. This file is the one place these counts are recorded; `make check` prints the current totals. Each distinct design has its own catalog entry, preview document, thumbnail, and settings. Palettes and other appearance controls remain settings. Archive paths identify source provenance; the original archive is not required to build this repository.
+The library contains 44 published entries: six Quick notes, five Players, eleven Glyphs, nine Interactive art widgets, nine Lockscreens, and four Sliders. All have native QML exports and are included in production builds. Lockscreens export visual components and demo interactions; they do not implement authentication or desktop session locking. Sliders expose a percentage value and user-change signal for a host model. This file is the one place these counts are recorded; `make check` prints the current totals. Each distinct design has its own catalog entry, preview document, thumbnail, and settings. Palettes and other appearance controls remain settings. Archive paths identify source provenance; the original archive is not required to build this repository.
+
+[Sea turtle](../widgets/interactive-art/sea-turtle/README.md), identified as `interactive-art-sea-turtle`, is published with a native Quickshell export and browser preview sharing its vector artwork and skeleton. Its preview bundle and native export retain the reference-derived artwork notice. The earlier Tidal turtle and Skeleton studies are kept outside this repository and do not appear in previews or builds.
 
 | Source page | Individual widgets |
 | --- | --- |
@@ -48,7 +50,7 @@ Lockscreens retain one entry per layout; artwork and motion variations share tha
 | Category | Widgets |
 | --- | ---: |
 | Glyphs | 11 |
-| Interactive art | 8 |
+| Interactive art | 9 |
 | Lockscreens | 9 |
 | Player | 5 |
 | Quick notes | 6 |

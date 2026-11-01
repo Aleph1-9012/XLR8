@@ -1,12 +1,16 @@
 # Interactive art
 
-Fish in space, Fish murmuration, Magnetic powder, Specimen chamber, Orbital playground, Resonance sculpture, Signal hunting, and Gravity sandbox each have an independent QML export and are included in production builds. Each preserves its original drawing and direct controls. Collections remain in memory. All designs are silent.
+Fish in space, Fish murmuration, Magnetic powder, Specimen chamber, Orbital playground, Resonance sculpture, Signal hunting, Gravity sandbox, and Sea turtle each have an independent QML export and are included in production builds. Each preserves its original drawing and direct controls. Collections remain in memory. All designs are silent.
+
+[Sea turtle](sea-turtle/README.md) has a native Quickshell export and browser preview, using the same swimming, skeleton, and vector pigment data on cream or white. It is a contained widget, with desktop overlay integration deferred. It is included in production builds, with the reference-derived artwork notice retained in its preview bundle and native export. The earlier Tidal turtle and Skeleton studies are archived outside this repository and are not included in previews or builds.
 
 ## Shared files
 
 `_shared/qml/` holds `ArtWidget.qml`, `ArtField.qml`, `ArtButton.qml`, `ArtText.qml`, and the `shell.qml` launcher, which the seven imported designs use unchanged. Each of those widget folders keeps its own `assets/ArtEngine.js`, `Widget.qml.tmpl`, preview, thumbnail, and README.
 
 [Fish murmuration](fish-murmuration/README.md) keeps its own Canvas component and launcher. Its `FishEngine.js` renderer is shared between the browser and Qt, with pointer interaction, pause/restart, and a speed setting. The export includes all five required files and needs no reference video.
+
+Sea turtle keeps its own `TurtleMotion.js`, `Pigment.js`, QML components, and shader sources and binaries. It shares neither the imported designs' helpers nor Fish murmuration's renderer. Save all 14 exported files, including `ARTWORK_NOTICE.txt`, and retain their subfolders.
 
 ## Components
 

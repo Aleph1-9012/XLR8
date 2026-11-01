@@ -1,16 +1,10 @@
 import { flushSync } from 'svelte';
 
-interface Reveal {
-  animation: Animation;
-  from: number;
-  to: number;
-}
-
-function labelBounds(node: HTMLElement) {
+function labelSize(node: HTMLElement): number {
   const style = getComputedStyle(node);
   const scale = style.scale === 'none' ? 1 : Number.parseFloat(style.scale);
 
-  return { node, rect: node.getBoundingClientRect(), size: Number.parseFloat(style.fontSize) * scale };
+  return Number.parseFloat(style.fontSize) * scale;
 }
 
 function visibleScroll(button: HTMLButtonElement, folderHeight: number): number {
@@ -19,7 +13,7 @@ function visibleScroll(button: HTMLButtonElement, folderHeight: number): number 
   if (button.getAttribute('aria-expanded') !== 'true') return start;
 
   const top = button.getBoundingClientRect().top;
-  const visibleTop = Math.max(12, Math.min(top, window.innerHeight - folderHeight - 16));
+  const visibleTop = Math.max(16, Math.min(top, window.innerHeight - folderHeight - 16));
 
   return Math.max(0, start + top - visibleTop);
 }
@@ -27,11 +21,26 @@ function visibleScroll(button: HTMLButtonElement, folderHeight: number): number 
 export function folderMotion(section: HTMLElement) {
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
   const phone = matchMedia('(max-width: 850px)');
+  const heading = section.querySelector<HTMLElement>('.family-directory-heading')!;
+  const title = heading.querySelector<HTMLElement>('.directory-title')!;
+  const folders = [...section.querySelectorAll<HTMLElement>('.family-folder')].map(node => ({
+    node,
+    button: node.querySelector<HTMLButtonElement>('.folder-toggle')!,
+    label: node.querySelector<HTMLElement>('.folder-toggle > span:nth-child(2)')!,
+    surface: node.querySelector<HTMLElement>('.folder-surface')!,
+    content: node.querySelector<HTMLElement>('.folder-content')!,
+    inner: node.querySelector<HTMLElement>('.folder-content-inner')!,
+  }));
   const animations: Animation[] = [];
-  const cleanups: (() => void)[] = [];
-  const reveals = new Map<HTMLElement, Reveal>();
   let width = section.clientWidth;
   let scrollFrame = 0;
+
+  function sizeTitle(): void {
+    const size = Number.parseFloat(getComputedStyle(title).fontSize);
+    title.style.setProperty('--title-compact-scale', String(24 / size));
+  }
+
+  sizeTitle();
 
   function stopScroll(): void {
     cancelAnimationFrame(scrollFrame);
@@ -46,33 +55,29 @@ export function folderMotion(section: HTMLElement) {
       animation.cancel();
     }
 
-    for (const cleanup of cleanups) cleanup();
-
     animations.length = 0;
-    cleanups.length = 0;
-    reveals.clear();
-    section.style.removeProperty('height');
-    delete section.dataset.folderMotion;
+
+    for (const folder of folders) folder.surface.style.removeProperty('--folder-art-height');
   }
 
   function measure() {
-    return [...section.querySelectorAll<HTMLElement>('.family-folder')].map(node => {
-      const content = node.querySelector<HTMLElement>('.folder-content')!;
-      const inner = node.querySelector<HTMLElement>('.folder-content-inner')!;
-      const reveal = reveals.get(inner);
-      const progress = reveal?.animation.effect?.getComputedTiming().progress ?? 1;
+    const headingRect = heading.getBoundingClientRect();
+    const titleRect = title.getBoundingClientRect();
 
-      return {
-        node,
-        rect: node.getBoundingClientRect(),
-        surface: node.querySelector<HTMLElement>('.folder-surface')!,
-        container: content,
-        content: inner,
-        contentRect: inner.getBoundingClientRect(),
-        visible: reveal ? reveal.from + (reveal.to - reveal.from) * progress : content.getBoundingClientRect().height,
-        labels: [...node.querySelectorAll<HTMLElement>('.folder-toggle > span')].map(labelBounds),
-      };
-    });
+    return {
+      headingHeight: headingRect.height,
+      titleX: titleRect.left - headingRect.left,
+      titleY: titleRect.top - headingRect.top,
+      titleScale: getComputedStyle(title).scale,
+      folders: folders.map(folder => ({
+        height: folder.node.getBoundingClientRect().height,
+        buttonHeight: folder.button.getBoundingClientRect().height,
+        buttonPadding: getComputedStyle(folder.button).paddingRight,
+        contentHeight: folder.content.getBoundingClientRect().height,
+        opacity: getComputedStyle(folder.inner).opacity,
+        labelSize: labelSize(folder.label),
+      })),
+    };
   }
 
   function run(update: () => void, button: HTMLButtonElement): void {
@@ -89,29 +94,21 @@ export function folderMotion(section: HTMLElement) {
     }
 
     const before = measure();
-    const sectionBefore = section.getBoundingClientRect();
-    const descriptor = section.querySelector<HTMLElement>('.family-directory-heading p')!;
-    const browse = section.querySelector<HTMLElement>('.folder-browse')!;
-    const descriptorBefore = descriptor.getBoundingClientRect();
-    const browseBefore = browse.getBoundingClientRect();
+    const minimum = section.style.minHeight;
+    // Keep the document tall enough while measuring, so the browser cannot clamp
+    // the scroll position to the final layout before the animation starts.
+    section.style.minHeight = `${section.getBoundingClientRect().height}px`;
     stop();
-
-    // Freeze page height while the folder contents take their final layout once.
-    section.style.height = `${sectionBefore.height}px`;
-    section.dataset.folderMotion = '';
     flushSync(update);
 
     const after = measure();
-    const descriptorAfter = descriptor.getBoundingClientRect();
-    const browseAfter = browse.getBoundingClientRect();
     const style = getComputedStyle(section);
-    const height = Math.max(Number.parseFloat(style.minHeight), browseAfter.bottom - section.getBoundingClientRect().top + Number.parseFloat(style.paddingBottom));
     const scrollStart = window.scrollY;
-    const opened = after.find(folder => folder.node.contains(button))!;
-    const scrollEnd = visibleScroll(button, opened.rect.height);
+    const opened = button.closest<HTMLElement>('.family-folder')!;
+    const scrollEnd = visibleScroll(button, opened.getBoundingClientRect().height);
     const options: KeyframeAnimationOptions = {
       duration: Number.parseFloat(style.getPropertyValue('--folder-duration')),
-      easing: style.getPropertyValue('--ease').trim(),
+      easing: style.getPropertyValue('--folder-ease').trim(),
       fill: 'both',
     };
 
@@ -122,70 +119,54 @@ export function folderMotion(section: HTMLElement) {
       return animation;
     }
 
-    for (const [index, end] of after.entries()) {
-      const start = before[index]!;
-      const shift = start.rect.top - end.rect.top;
+    const clock = animate(heading, [
+      { height: `${before.headingHeight}px` },
+      { height: `${after.headingHeight}px` },
+    ]);
 
-      if (Math.abs(shift) > .1) animate(end.node, [{ translate: `0 ${shift}px` }, { translate: '0 0' }]);
+    if (before.titleScale !== after.titleScale || before.titleX !== after.titleX || before.titleY !== after.titleY) {
+      // Keep the full-size type on one layer. Scaling the same two-line layout
+      // avoids both a mid-motion pause and a font-size change on completion.
+      animate(title, [
+        { translate: `${before.titleX - after.titleX}px ${before.titleY - after.titleY}px`, scale: before.titleScale },
+        { translate: '0 0', scale: after.titleScale },
+      ]);
+    }
 
-      // Later folders cover this fixed-size artwork as they move. The grain and
-      // silhouette no longer resize and repaint on every animation frame.
-      end.surface.style.height = `${Math.max(start.rect.height, end.rect.height) + 28}px`;
-      end.surface.style.bottom = 'auto';
-      cleanups.push(() => {
-        end.surface.style.removeProperty('height');
-        end.surface.style.removeProperty('bottom');
-      });
+    for (const [index, folder] of folders.entries()) {
+      const start = before.folders[index]!;
+      const end = after.folders[index]!;
+      // Clip a fixed-size print instead of stretching its grain on each frame.
+      folder.surface.style.setProperty('--folder-art-height', `${Math.max(start.height, end.height) + 28}px`);
 
-      for (const [labelIndex, label] of end.labels.entries()) {
-        const previous = start.labels[labelIndex]!;
-        const x = previous.rect.left - label.rect.left;
-        const y = previous.rect.top + previous.rect.height / 2 - label.rect.top - label.rect.height / 2 - shift;
-
-        if (Math.abs(x) < .1 && Math.abs(y) < .1 && Math.abs(previous.size - label.size) < .01) continue;
-
-        animate(label.node, [
-          { translate: `${x}px ${y}px`, scale: String(previous.size / label.size) },
-          { translate: '0 0', scale: '1' },
+      if (start.buttonHeight !== end.buttonHeight || start.buttonPadding !== end.buttonPadding) {
+        animate(folder.button, [
+          { height: `${start.buttonHeight}px`, minHeight: `${start.buttonHeight}px`, paddingRight: start.buttonPadding },
+          { height: `${end.buttonHeight}px`, minHeight: `${end.buttonHeight}px`, paddingRight: end.buttonPadding },
         ]);
       }
 
-      if (start.visible === 0 && end.visible === 0) continue;
+      if (start.contentHeight !== 0 || end.contentHeight !== 0) {
+        animate(folder.content, [{ height: `${start.contentHeight}px` }, { height: `${end.contentHeight}px` }]);
+        animate(folder.inner, [{ opacity: start.opacity }, { opacity: end.opacity }]);
+      }
 
-      const fullHeight = Math.max(start.contentRect.height, end.contentRect.height, start.visible, end.visible);
-      const content = end.content;
-      // Keep the measured final layout while the contents animate outside its flow.
-      // Otherwise later folders collapse upward, then jump back when motion ends.
-      end.container.style.height = `${end.visible}px`;
-      content.style.position = 'absolute';
-      content.style.inset = '0 0 auto';
-      content.style.height = `${fullHeight}px`;
-      cleanups.push(() => {
-        end.container.style.removeProperty('height');
-        content.style.removeProperty('position');
-        content.style.removeProperty('inset');
-        content.style.removeProperty('height');
-      });
-
-      const animation = animate(content, [
-        { clipPath: `inset(0 0 ${fullHeight - start.visible}px)`, translate: `0 ${start.contentRect.top - end.contentRect.top - shift}px` },
-        { clipPath: `inset(0 0 ${fullHeight - end.visible}px)`, translate: '0 0' },
-      ]);
-      reveals.set(content, { animation, from: start.visible, to: end.visible });
+      if (Math.abs(start.labelSize - end.labelSize) >= .01) {
+        animate(folder.label, [{ scale: String(start.labelSize / end.labelSize) }, { scale: '1' }]);
+      }
     }
 
-    animate(descriptor, [{ translate: `0 ${descriptorBefore.top - descriptorAfter.top}px` }, { translate: '0 0' }]);
-    animate(browse, [{ translate: `0 ${browseBefore.top - browseAfter.top}px` }, { translate: '0 0' }]);
-    // Only the outer spacer changes height; text and artwork move as fixed layers.
-    const clock = animate(section, [{ height: `${sectionBefore.height}px` }, { height: `${height}px` }]);
+    // The animated heights now reserve their own space. Following rows and the
+    // footer stay in flow, including during a reversal or a change of folder.
+    if (minimum) section.style.minHeight = minimum;
+    else section.style.removeProperty('min-height');
+
     clock.onfinish = () => {
       if (scrollFrame) window.scrollTo({ top: scrollEnd, behavior: 'instant' });
 
       stop();
     };
 
-    // Keep the newly opened contents visible, using the same timeline. Wheel and
-    // touch input cancel this correction instead of competing with the visitor.
     if (scrollEnd !== scrollStart) {
       function scroll(): void {
         const progress = clock.effect?.getComputedTiming().progress ?? 1;
@@ -202,6 +183,7 @@ export function folderMotion(section: HTMLElement) {
 
     width = section.clientWidth;
     stop();
+    sizeTitle();
   });
   observer.observe(section);
   preference.addEventListener('change', stop);
@@ -213,6 +195,7 @@ export function folderMotion(section: HTMLElement) {
     run,
     destroy(): void {
       stop();
+      title.style.removeProperty('--title-compact-scale');
       observer.disconnect();
       preference.removeEventListener('change', stop);
       document.removeEventListener('visibilitychange', stop);

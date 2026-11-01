@@ -1,0 +1,189 @@
+// SPDX-License-Identifier: 0BSD
+pragma ComponentBehavior: Bound
+import QtQuick
+import QtQuick.Window
+import "TurtleMotion.js" as Motion
+import "Pigment.js" as Pigment
+
+Item {
+    id: root
+
+    property real speed: {{speed}}
+    property real turtleSize: {{size}}
+    property string background: {{background}}
+    property bool paused: false
+    property var scene: null
+    property var matrices: []
+    property vector2d turtlePosition: Qt.vector2d(0, 0)
+    property vector2d turtleHeading: Qt.vector2d(1, 0)
+    property real turtleScale: 0
+    property var press: null
+    readonly property var parts: Motion.SeaTurtleMotion.parts(Pigment.SeaTurtlePigment)
+    readonly property color paper: background === "White" ? "#ffffff" : "#fefbf4"
+    readonly property real pixelRatio: Math.min(3, Screen.devicePixelRatio)
+    readonly property int sceneFactor: width * height * pixelRatio * pixelRatio * 4 <= 16e6 ? 2 : 1
+    readonly property real detail: Math.min(1, turtleScale * pixelRatio * sceneFactor / Motion.SeaTurtleMotion.REFERENCE_SCALE)
+    readonly property bool running: visible && !paused && scene !== null && width > 0 && height > 0
+        && Window.visibility !== Window.Hidden && Window.visibility !== Window.Minimized
+
+    implicitWidth: 640
+    implicitHeight: 400
+    clip: true
+    activeFocusOnTab: true
+    Accessible.role: Accessible.Graphic
+    Accessible.name: "Painted sea turtle. Click to call it, drag to move it, or tap it to dart. Space pauses, arrow keys steer, R recenters."
+
+    function refreshFrame(): void {
+        if (scene === null) return;
+
+        const pose = Motion.SeaTurtleMotion.pose(scene.turtle);
+        const next = [];
+        for (let offset = 0; offset < pose.length; offset += 16) {
+            next.push(Qt.matrix4x4(
+                pose[offset], pose[offset + 4], pose[offset + 8], pose[offset + 12],
+                pose[offset + 1], pose[offset + 5], pose[offset + 9], pose[offset + 13],
+                pose[offset + 2], pose[offset + 6], pose[offset + 10], pose[offset + 14],
+                pose[offset + 3], pose[offset + 7], pose[offset + 11], pose[offset + 15]));
+        }
+        matrices = next;
+        turtlePosition = Qt.vector2d(scene.turtle.x, scene.turtle.y);
+        turtleHeading = Qt.vector2d(Math.cos(scene.turtle.angle), Math.sin(scene.turtle.angle));
+        turtleScale = scene.scale;
+    }
+
+    function layout(): void {
+        if (scene === null || width <= 0 || height <= 0) return;
+
+        scene.configure(Math.max(0.6, Math.min(1.4, turtleSize)));
+        scene.layout(width, height);
+        refreshFrame();
+    }
+
+    function recenter(): void {
+        if (scene === null) return;
+
+        scene.recenter();
+        refreshFrame();
+    }
+
+    function steer(x: real, y: real): void {
+        if (scene === null) return;
+
+        scene.call(scene.turtle.x + x * scene.bodyPixels(), scene.turtle.y + y * scene.bodyPixels());
+    }
+
+    function release(x: real, y: real, canceled: bool): void {
+        if (press === null || scene === null) return;
+
+        const turtle = scene.turtle;
+        turtle.held = false;
+        if (!canceled && !press.moved) {
+            if (press.onTurtle) scene.dart();
+            else if (paused) {
+                turtle.x = x;
+                turtle.y = y;
+            } else scene.call(x, y);
+        } else if (!canceled && press.onTurtle) {
+            turtle.speed = Math.min(Math.hypot(press.velocityX, press.velocityY) * .35, scene.bodyPixels() * .8);
+            turtle.goal = null;
+        }
+        press = null;
+        refreshFrame();
+    }
+
+    onWidthChanged: layout()
+    onHeightChanged: layout()
+    onTurtleSizeChanged: layout()
+    onVisibleChanged: if (!visible) release(0, 0, true)
+    Keys.onSpacePressed: paused = !paused
+    Keys.onLeftPressed: steer(-1, 0)
+    Keys.onRightPressed: steer(1, 0)
+    Keys.onUpPressed: steer(0, -1)
+    Keys.onDownPressed: steer(0, 1)
+    Keys.onPressed: event => {
+        if (event.key === Qt.Key_R) {
+            root.recenter();
+            event.accepted = true;
+        }
+    }
+    Component.onCompleted: {
+        scene = Motion.SeaTurtleMotion.create();
+        layout();
+    }
+
+    FrameAnimation {
+        running: root.running
+        onTriggered: {
+            root.scene.advance(Math.min(frameTime, .05) * Math.max(.5, Math.min(2, root.speed)));
+            root.refreshFrame();
+        }
+    }
+
+    Rectangle { anchors.fill: parent; color: root.paper }
+
+    Item {
+        id: painting
+        anchors.fill: parent
+        layer.enabled: true
+        layer.textureSize: Qt.size(Math.max(1, Math.round(width * root.pixelRatio * root.sceneFactor)), Math.max(1, Math.round(height * root.pixelRatio * root.sceneFactor)))
+        layer.smooth: true
+        layer.effect: ShaderEffect {
+            property var source
+            property color backgroundColor: root.paper
+            property vector2d pixelStep: Qt.vector2d(1 / Math.max(1, root.width * root.pixelRatio), 1 / Math.max(1, root.height * root.pixelRatio))
+            fragmentShader: Qt.resolvedUrl("shaders/finish.frag.qsb")
+        }
+        Repeater {
+            model: root.matrices.length ? root.parts : []
+            TurtlePart {
+                required property var modelData
+                anchors.fill: parent
+                part: modelData
+                matrices: root.matrices
+                position: root.turtlePosition
+                heading: root.turtleHeading
+                turtleScale: root.turtleScale
+                detail: root.detail
+            }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: root.press && root.press.onTurtle ? Qt.ClosedHandCursor : root.scene && root.scene.hit(mouseX, mouseY) ? Qt.OpenHandCursor : Qt.ArrowCursor
+        onPressed: mouse => {
+            if (root.scene === null) return;
+
+            root.forceActiveFocus(Qt.MouseFocusReason);
+            const turtle = root.scene.turtle;
+            const onTurtle = root.scene.hit(mouse.x, mouse.y);
+            root.press = { x: mouse.x, y: mouse.y, offsetX: turtle.x - mouse.x, offsetY: turtle.y - mouse.y,
+                onTurtle, moved: false, velocityX: 0, velocityY: 0, time: Date.now() };
+            turtle.held = onTurtle;
+        }
+        onPositionChanged: mouse => {
+            if (root.press === null) return;
+
+            const press = root.press;
+            if (Math.hypot(mouse.x - press.x, mouse.y - press.y) > 6) press.moved = true;
+
+            if (press.onTurtle && press.moved) {
+                const turtle = root.scene.turtle;
+                const now = Date.now();
+                const elapsed = Math.max((now - press.time) / 1000, .001);
+                const x = mouse.x + press.offsetX;
+                const y = mouse.y + press.offsetY;
+                const blend = 1 - Math.exp(-18 * elapsed);
+                press.velocityX += ((x - turtle.x) / elapsed - press.velocityX) * blend;
+                press.velocityY += ((y - turtle.y) / elapsed - press.velocityY) * blend;
+                press.time = now;
+                turtle.x = x;
+                turtle.y = y;
+                root.refreshFrame();
+            }
+        }
+        onReleased: mouse => root.release(mouse.x, mouse.y, false)
+        onCanceled: root.release(0, 0, true)
+    }
+}

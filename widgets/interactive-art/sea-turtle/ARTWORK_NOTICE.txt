@@ -1,0 +1,10 @@
+Sea turtle artwork notice
+
+Pigment.js contains vector contours and colors measured from an image supplied
+by the repository owner. Converting that image into vector marks does not change
+its ownership or grant a new license to the artwork.
+
+The 0BSD LICENSE applies to the original program code, not to Pigment.js or the
+reference-derived appearance of the turtle. Distribution rights for that artwork
+have not been recorded in this repository. Retain this notice with copies of
+Pigment.js.

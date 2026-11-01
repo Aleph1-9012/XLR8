@@ -1,0 +1,152 @@
+{
+  "id": "interactive-art-sea-turtle",
+  "title": "Sea turtle",
+  "summary": "A sea turtle painted in teal, blue, sage, and amber pigment swims across a solid background with real flipper strokes. Click to call it, drag it, or tap it to make it dart.",
+  "category": "Interactive art",
+  "tags": [
+    "interactive-art",
+    "turtle",
+    "webgl",
+    "qml"
+  ],
+  "status": "published",
+  "preview": "preview/index.html",
+  "thumbnail": "thumbnail.webp",
+  "usage": "README.md",
+  "settings": [
+    {
+      "key": "speed",
+      "label": "Swim speed",
+      "type": "number",
+      "default": 1,
+      "min": 0.5,
+      "max": 2,
+      "step": 0.25
+    },
+    {
+      "key": "size",
+      "label": "Turtle size",
+      "type": "number",
+      "default": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.1
+    },
+    {
+      "key": "background",
+      "label": "Background",
+      "type": "enum",
+      "default": "Cream",
+      "choices": [
+        "Cream",
+        "White"
+      ]
+    }
+  ],
+  "publicFiles": [
+    {
+      "source": "preview/index.html",
+      "path": "preview/index.html"
+    },
+    {
+      "source": "preview/turtle.js",
+      "path": "preview/turtle.js"
+    },
+    {
+      "source": "preview/adapter.js",
+      "path": "preview/adapter.js"
+    },
+    {
+      "source": "thumbnail.webp",
+      "path": "thumbnail.webp"
+    },
+    {
+      "source": "LICENSE",
+      "path": "LICENSE"
+    },
+    {
+      "source": "assets/TurtleMotion.js",
+      "path": "assets/TurtleMotion.js"
+    },
+    {
+      "source": "assets/Pigment.js",
+      "path": "assets/Pigment.js"
+    },
+    {
+      "source": "ARTWORK_NOTICE.txt",
+      "path": "ARTWORK_NOTICE.txt"
+    }
+  ],
+  "exports": [
+    {
+      "source": "qml/Widget.qml.tmpl",
+      "path": "Widget.qml",
+      "kind": "template"
+    },
+    {
+      "source": "qml/TurtlePart.qml",
+      "path": "TurtlePart.qml",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shell.qml",
+      "path": "shell.qml",
+      "kind": "file"
+    },
+    {
+      "source": "assets/TurtleMotion.js",
+      "path": "TurtleMotion.js",
+      "kind": "file"
+    },
+    {
+      "source": "assets/Pigment.js",
+      "path": "Pigment.js",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shaders/turtle.vert",
+      "path": "shaders/turtle.vert",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shaders/turtle.vert.qsb",
+      "path": "shaders/turtle.vert.qsb",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shaders/turtle.frag",
+      "path": "shaders/turtle.frag",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shaders/turtle.frag.qsb",
+      "path": "shaders/turtle.frag.qsb",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shaders/finish.frag",
+      "path": "shaders/finish.frag",
+      "kind": "file"
+    },
+    {
+      "source": "qml/shaders/finish.frag.qsb",
+      "path": "shaders/finish.frag.qsb",
+      "kind": "file"
+    },
+    {
+      "source": "README.md",
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "source": "LICENSE",
+      "path": "LICENSE",
+      "kind": "file"
+    },
+    {
+      "source": "ARTWORK_NOTICE.txt",
+      "path": "ARTWORK_NOTICE.txt",
+      "kind": "file"
+    }
+  ]
+}

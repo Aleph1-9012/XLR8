@@ -36,7 +36,7 @@
 <section class="menu-section" id="families" aria-label="Explore widget families" class:folder-open={Boolean(opened)} bind:this={section}>
   <div class="family-directory">
     <header class="family-directory-heading">
-      <h2><span class="directory-title">Pick a family</span><span class="directory-title-poster" aria-hidden="true">Pick a<br />family</span></h2>
+      <h2 class="directory-title"><span>Pick a</span>{' '}<span>family</span></h2>
       <p>{padded(categories.length)} families, {widgets.length} widgets. <span class="directory-instruction">Hover a name to preview it; tap or click to open it.</span><span class="folder-instruction">Tap a folder to open it.</span></p>
     </header>
     <nav class="family-directory-rows" class:many-families={categories.length > 8} class:split-families={categories.length > 10} aria-label="Explore families">

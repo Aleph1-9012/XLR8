@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+    <title>Sea turtle</title>
+    <style>
+      html { color-scheme: light; overflow: hidden; background: #fefbf4; }
+      body { margin: 0; display: flow-root; }
+      canvas { display: block; width: 100%; min-height: 320px; aspect-ratio: 8 / 5; outline: none; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+      canvas:focus-visible:not([data-pointer-focus]) { outline: 2px solid #1c7c9c; outline-offset: -2px; }
+      canvas[data-over] { cursor: grab; }
+      canvas[data-held] { cursor: grabbing; }
+    </style>
+  </head>
+  <body>
+    <canvas id="sea" width="1280" height="800" tabindex="0" role="img" aria-label="A sea turtle painted in teal, blue, sage, and amber pigment swims across the preview. Click a spot to call it, drag it to move it, or tap it to make it dart. Space pauses, arrow keys steer, and R recenters.">A sea turtle swimming, drawn in code.</canvas>
+    <script src="../preview-runtime.js"></script>
+    <script src="../assets/Pigment.js"></script>
+    <script src="../assets/TurtleMotion.js"></script>
+    <script src="turtle.js"></script>
+    <script src="adapter.js"></script>
+  </body>
+</html>
