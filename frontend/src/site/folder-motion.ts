@@ -66,6 +66,7 @@ export function folderMotion(section: HTMLElement) {
         node,
         rect: node.getBoundingClientRect(),
         surface: node.querySelector<HTMLElement>('.folder-surface')!,
+        container: content,
         content: inner,
         contentRect: inner.getBoundingClientRect(),
         visible: reveal ? reveal.from + (reveal.to - reveal.from) * progress : content.getBoundingClientRect().height,
@@ -153,10 +154,14 @@ export function folderMotion(section: HTMLElement) {
 
       const fullHeight = Math.max(start.contentRect.height, end.contentRect.height, start.visible, end.visible);
       const content = end.content;
+      // Keep the measured final layout while the contents animate outside its flow.
+      // Otherwise later folders collapse upward, then jump back when motion ends.
+      end.container.style.height = `${end.visible}px`;
       content.style.position = 'absolute';
       content.style.inset = '0 0 auto';
       content.style.height = `${fullHeight}px`;
       cleanups.push(() => {
+        end.container.style.removeProperty('height');
         content.style.removeProperty('position');
         content.style.removeProperty('inset');
         content.style.removeProperty('height');

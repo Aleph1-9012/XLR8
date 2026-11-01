@@ -62,7 +62,8 @@
   });
   canvas.addEventListener('pointerleave', () => setPointer(scene, .5, .5, false));
   canvas.addEventListener('pointerdown', event => {
-    canvas.focus();
+    canvas.dataset.pointerFocus = '';
+    canvas.focus({ preventScroll: true });
     const box = canvas.getBoundingClientRect();
     setPointer(scene, (event.clientX - box.left) / box.width, (event.clientY - box.top) / box.height, true);
   });
@@ -70,7 +71,10 @@
     if (event.pointerType !== 'mouse') setPointer(scene, .5, .5, false);
   });
   canvas.addEventListener('pointercancel', () => setPointer(scene, .5, .5, false));
+  canvas.addEventListener('blur', () => { delete canvas.dataset.pointerFocus; });
   canvas.addEventListener('keydown', event => {
+    delete canvas.dataset.pointerFocus;
+
     if (event.code === 'Space') {
       event.preventDefault();
       paused = !paused;

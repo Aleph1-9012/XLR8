@@ -135,6 +135,7 @@
 
 @media (max-width: 374px) {
   .directory-title-poster { font-size: 19.8vw; }
+  .folder-open .family-directory-heading { height: 104px; }
   .folder-toggle { grid-template-columns: 26px minmax(0, 1fr) 16px; font-size: 7.1vw; letter-spacing: .1em; }
   .folder-open .folder-toggle { font-size: 19px; }
   .compact .family-inventory a { font-size: 11px; letter-spacing: .02em; gap: 6px; }
