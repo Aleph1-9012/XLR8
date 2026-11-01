@@ -4,11 +4,10 @@
   import { fade } from 'svelte/transition';
   import { prefersReducedMotion } from 'svelte/motion';
 
-  let { definition, values, error, choiceButtons = false, change }: {
+  let { definition, values, error, change }: {
     definition: Definition;
     values: Settings;
     error: FieldError | undefined;
-    choiceButtons?: boolean;
     change: (key: string, value: string | number | boolean) => void;
   } = $props();
 
@@ -47,35 +46,21 @@
         {@const id = `setting-${setting.key}`}
         {@const invalid = error?.key === setting.key}
         <div class="setting-field" class:boolean-field={setting.type === 'boolean'} class:number-field={setting.type === 'number'}>
-          {#if setting.type === 'enum' && choiceButtons}
-            <fieldset class="setting-choices">
-              <legend>{setting.label}</legend>
-              <div class="choice-options">
-                {#each setting.choices as choice}
-                  <label class="setting-choice">
-                    <input class="sr-only" type="radio" name={id} value={choice} checked={values[setting.key] === choice} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} onchange={() => change(setting.key, choice)} />
-                    <span>{choice}</span>
-                  </label>
-                {/each}
-              </div>
-            </fieldset>
+          <label for={id}>{setting.label}</label>
+          {#if setting.type === 'enum'}
+            <div class="select-wrap"><select {id} value={String(values[setting.key])} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} onchange={event => change(setting.key, event.currentTarget.value)}>
+              {#each setting.choices as choice}<option value={choice}>{choice}</option>{/each}
+            </select><span aria-hidden="true">↓</span></div>
+          {:else if setting.type === 'number'}
+            <input class="setting-number" type="number" aria-label={`${setting.label} value`} value={Number(values[setting.key])} min={setting.min} max={setting.max} step={setting.step} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.valueAsNumber)} />
+            <input {id} type="range" min={setting.min} max={setting.max} step={setting.step} value={Number(values[setting.key])} style:--progress={`${Math.max(0, Math.min(100, (Number(values[setting.key]) - setting.min) / (setting.max - setting.min) * 100))}%`} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.valueAsNumber)} />
+            <div class="range-ends" aria-hidden="true"><span>{setting.min}</span><span>{setting.max}</span></div>
+          {:else if setting.type === 'boolean'}
+            <input {id} class="setting-switch" type="checkbox" role="switch" checked={Boolean(values[setting.key])} oninput={event => change(setting.key, event.currentTarget.checked)} />
+          {:else if setting.type === 'color'}
+            <div class="color-field"><input {id} type="color" value={String(values[setting.key])} oninput={event => change(setting.key, event.currentTarget.value)} /><input type="text" aria-label={`${setting.label} hex`} value={String(values[setting.key])} maxlength="7" aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.value)} /></div>
           {:else}
-            <label for={id}>{setting.label}</label>
-            {#if setting.type === 'enum'}
-              <div class="select-wrap"><select {id} value={String(values[setting.key])} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} onchange={event => change(setting.key, event.currentTarget.value)}>
-                {#each setting.choices as choice}<option value={choice}>{choice}</option>{/each}
-              </select><span aria-hidden="true">↓</span></div>
-            {:else if setting.type === 'number'}
-              <input class="setting-number" type="number" aria-label={`${setting.label} value`} value={Number(values[setting.key])} min={setting.min} max={setting.max} step={setting.step} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.valueAsNumber)} />
-              <input {id} type="range" min={setting.min} max={setting.max} step={setting.step} value={Number(values[setting.key])} style:--progress={`${Math.max(0, Math.min(100, (Number(values[setting.key]) - setting.min) / (setting.max - setting.min) * 100))}%`} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.valueAsNumber)} />
-              <div class="range-ends" aria-hidden="true"><span>{setting.min}</span><span>{setting.max}</span></div>
-            {:else if setting.type === 'boolean'}
-              <input {id} class="setting-switch" type="checkbox" role="switch" checked={Boolean(values[setting.key])} oninput={event => change(setting.key, event.currentTarget.checked)} />
-            {:else if setting.type === 'color'}
-              <div class="color-field"><input {id} type="color" value={String(values[setting.key])} oninput={event => change(setting.key, event.currentTarget.value)} /><input type="text" aria-label={`${setting.label} hex`} value={String(values[setting.key])} maxlength="7" aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.value)} /></div>
-            {:else}
-              <input {id} type="text" value={String(values[setting.key])} maxlength={setting.maxLength} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.value)} />
-            {/if}
+            <input {id} type="text" value={String(values[setting.key])} maxlength={setting.maxLength} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined} oninput={event => change(setting.key, event.currentTarget.value)} />
           {/if}
           {#if invalid}<p class="field-error" id={`${id}-error`}>{error?.message}</p>{/if}
         </div>

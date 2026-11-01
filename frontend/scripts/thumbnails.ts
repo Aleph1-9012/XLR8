@@ -10,6 +10,8 @@ interface ThumbnailFrame {
   selector: string;
   viewportWidth: number;
   padding: number;
+  canvasWidth?: number;
+  pixelWidth?: number;
   background?: { r: number; g: number; b: number; a: number };
 }
 
@@ -20,6 +22,7 @@ const frames = new Map<string, ThumbnailFrame>([
   ['glyphs-radical-exchange', { selector: '.tr-screen', viewportWidth: 800, padding: 0 }],
   ['quick-notes-console', { selector: '#ts-notes-c', viewportWidth: 800, padding: 20 }],
   ['interactive-art-fish-murmuration', { selector: 'canvas', viewportWidth: 968, padding: 64, background: { r: 3, g: 3, b: 3, a: 1 } }],
+  ['interactive-art-sea-turtle', { selector: 'canvas', viewportWidth: 1280, canvasWidth: 1280, pixelWidth: 3200, padding: 0, background: { r: 254, g: 251, b: 244, a: 1 } }],
   ['tsugumori', { selector: '#fl-background-panel', viewportWidth: 1024, padding: 0 }],
 ]);
 
@@ -60,14 +63,19 @@ try {
     const { ratio } = presentation(item);
     const width = Math.min(800, 500 * ratio);
     const height = width / ratio;
-    // Cover the largest one- and two-column cards at 2x without storing cropped-away pixels.
-    const pixelWidth = ratio >= 1.59 ? 2000 : 1320;
-    const density = pixelWidth / width;
     const artwork = item.category === 'Interactive art';
     const frame: ThumbnailFrame | undefined = frames.get(item.id) ?? (artwork ? { selector: 'canvas', viewportWidth: 800, padding: 0 } : undefined);
+    // Render compact canvases at the capture resolution instead of enlarging their pixels.
+    const pixelWidth = frame?.pixelWidth ?? (ratio >= 1.59 ? 2000 : 1320);
+    const density = pixelWidth / (frame?.canvasWidth ?? width);
     const page = await browser.newPage({ viewport: { width: frame?.viewportWidth ?? 800, height: 500 }, deviceScaleFactor: density, reducedMotion: 'reduce' });
     const preview = new URL(bundle.definition.preview, new URL('.', new URL(item.bundleUrl, base)));
     await page.goto(preview.href);
+
+    if (frame?.canvasWidth) {
+      await page.addStyleTag({ content: `${frame.selector} { width: ${frame.canvasWidth}px; max-width: none; }` });
+    }
+
     await page.evaluate(async ({ settings, artwork }) => {
       const token = crypto.randomUUID();
       await new Promise<void>((done, reject) => {
